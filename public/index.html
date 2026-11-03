@@ -4,52 +4,63 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f8f8f5">
-  <meta name="description" content="Nền tảng kết nối việc làm hai chiều, giúp sinh viên và nhà tuyển dụng tìm thấy nhau phù hợp hơn.">
-  <title>Kết Nối — Cơ hội đúng, dành cho bạn</title>
+  <meta name="description" content="Ketnoi giúp sinh viên khám phá cơ hội theo kỹ năng và giúp nhà tuyển dụng kết nối với ứng viên phù hợp.">
+  <meta property="og:title" content="Ketnoi — Công việc phù hợp. Con đường của bạn.">
+  <meta property="og:description" content="Khám phá cơ hội theo kỹ năng, định hướng và cách bạn muốn làm việc.">
+  <meta property="og:type" content="website">
+  <title>Ketnoi — Công việc phù hợp. Con đường của bạn.</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/overrides.css">
+  <link rel="stylesheet" href="/home.css">
   <script src="/sprint1/app.js" defer></script>
 </head>
 <body>
-  <header class="topbar">
-    <a class="brand" href="/" aria-label="Kết Nối — Trang chủ"><span class="brand-mark">k</span><span>ketnoi<span class="brand-dot">.</span></span></a>
-    <nav class="desktop-nav" id="primary-nav" aria-label="Điều hướng chính"><a href="#how">Cách hoạt động</a><a href="#opportunities">Dành cho bạn</a><a href="#about">Về chúng tôi</a></nav>
-    <div class="nav-actions" id="nav-actions"><button class="btn btn-quiet" data-open="login">Đăng nhập</button><button class="btn btn-primary btn-small" data-open="register">Tạo tài khoản <span aria-hidden="true">↗</span></button></div>
+  <header class="topbar site-header">
+    <a class="brand" href="/" aria-label="Ketnoi — Trang chủ"><span class="brand-mark">k</span><span>ketnoi<span class="brand-dot">.</span></span></a>
+    <nav class="desktop-nav site-nav" id="primary-nav" aria-label="Điều hướng chính"><a href="#candidates">Sinh viên</a><a href="#employers">Nhà tuyển dụng</a><a href="#how">Cách hoạt động</a></nav>
+    <div class="nav-actions site-actions" id="nav-actions"><button class="btn btn-quiet" data-open="login">Đăng nhập</button><button class="btn btn-primary btn-small" data-open="register">Bắt đầu <span aria-hidden="true">↗</span></button></div>
     <button class="mobile-menu" id="mobile-menu" aria-label="Mở menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
   </header>
   <main>
-    <section class="hero wrap">
-      <div class="hero-copy">
-        <div class="eyebrow"><span class="pulse"></span> NỀN TẢNG KẾT NỐI VIỆC LÀM HAI CHIỀU <span class="eyebrow-line"></span></div>
-        <h1>Tìm đúng cơ hội.<br><span class="serif-accent">Gặp đúng người.</span></h1>
-        <p class="hero-lead">Khám phá công việc theo kỹ năng và định hướng của bạn. Nhà tuyển dụng cũng có thể chủ động tìm ứng viên phù hợp — minh bạch ngay từ kết nối đầu tiên.</p>
-        <div class="hero-cta"><button class="btn btn-primary btn-large" data-open="register">Tạo hồ sơ miễn phí <span>↗</span></button><button class="text-link button-link" data-open="employer">Tôi là nhà tuyển dụng <span>↗</span></button></div>
-        <div class="hero-proof"><span class="proof-check">✓</span><p><strong>Thiết kế cho sinh viên và nhà tuyển dụng</strong><br><span>Gợi ý có lý do · Quyền riêng tư do bạn kiểm soát</span></p></div>
-      </div>
-      <div class="hero-art" aria-label="Minh họa gợi ý việc làm phù hợp">
-        <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div><div class="art-sun"></div>
-        <div class="art-card job-card"><div class="job-logo">◈</div><div><span class="card-label">VÍ DỤ CƠ HỘI</span><h3>Product Designer</h3><p>Studio Mầm · TP. Hồ Chí Minh</p></div><div class="match-score"><strong>↗</strong><span>Thực tập</span></div><div class="skill-pills"><span>Figma</span><span>UX Research</span><span>Hybrid</span></div><div class="card-reason"><span>✦</span> Xem kỹ năng và yêu cầu trước khi ứng tuyển</div></div>
-        <div class="floating-note note-top"><span class="note-icon note-green">✓</span><div><strong>Hồ sơ theo kỹ năng</strong><small>Chia sẻ điều nhà tuyển dụng cần</small></div></div>
-        <div class="floating-note note-bottom"><span class="note-icon note-orange">◉</span><div><strong>Quyền riêng tư của bạn</strong><small>Chọn cách hồ sơ được hiển thị</small></div></div>
-        <div class="art-caption">MỞ RA CON ĐƯỜNG CỦA BẠN <span>✳</span></div>
-      </div>
-    </section>
-
-    <section class="trust-strip wrap" id="about"><span>ĐƯỢC THIẾT KẾ CHO</span><div class="trust-logos"><b class="logo-word">Sinh viên mới tốt nghiệp</b><b class="logo-word">Thực tập sinh</b><b class="logo-word">Nhà tuyển dụng</b><b class="logo-word">Nhân sự</b></div></section>
-
-    <section class="section wrap" id="how">
-      <div class="section-heading"><div><div class="eyebrow">ÍT ỒN ÀO HƠN. ĐÚNG CƠ HỘI HƠN.</div><h2>Kết nối tốt bắt đầu<br>từ <span class="serif-accent">hiểu nhau.</span></h2></div><p>Chúng tôi tin rằng công việc đầu tiên không chỉ là một dòng trong CV. Đó là nơi tài năng gặp đúng cơ hội.</p></div>
-      <div class="feature-grid">
-        <article class="feature-card feature-dark"><div class="feature-icon icon-lime">✳</div><span class="feature-kicker">01 — DÀNH CHO SINH VIÊN</span><h3>Biết mình<br>phù hợp với đâu.</h3><p>Hồ sơ năng lực giúp bạn thấy rõ thế mạnh. Gợi ý việc làm đi kèm lý do để bạn tự tin chọn hướng đi.</p><a href="#opportunities" class="feature-link">Khám phá cơ hội <span>↗</span></a><div class="feature-visual visual-profile"><div class="profile-avatar">A</div><div><strong>Nguyễn Minh Anh</strong><small>Product Design · Sinh viên năm 3</small><div class="mini-progress"><i></i></div></div><span class="profile-check">✓</span></div></article>
-        <article class="feature-card feature-light"><div class="feature-icon icon-peach">↗</div><span class="feature-kicker">02 — DÀNH CHO NHÀ TUYỂN DỤNG</span><h3>Gặp đúng người<br>có tiềm năng.</h3><p>Tìm ứng viên theo kỹ năng và định hướng. Mỗi gợi ý đều cho bạn biết vì sao hồ sơ phù hợp.</p><a href="#opportunities" class="feature-link">Tìm ứng viên <span>↗</span></a><div class="candidate-stack"><span class="candidate-demo-label">HỒ SƠ MINH HỌA</span><div class="candidate-row"><span class="candidate-avatar ca1">L</span><div><strong>Lê Hoàng Long</strong><small>Frontend Developer</small></div><b>94%</b></div><div class="candidate-row"><span class="candidate-avatar ca2">T</span><div><strong>Trần Thảo Vy</strong><small>UI/UX Designer</small></div><b>89%</b></div><div class="candidate-row"><span class="candidate-avatar ca3">P</span><div><strong>Phạm Gia Phúc</strong><small>Data Analyst</small></div><b>86%</b></div></div></article>
+    <section class="home-hero">
+      <div class="home-hero-inner">
+        <div class="home-copy">
+          <p class="home-kicker"><span></span> KẾT NỐI NGHỀ NGHIỆP HAI CHIỀU</p>
+          <h1>Công việc phù hợp.<br><em>Con đường của bạn.</em></h1>
+          <p class="home-lead">Tìm cơ hội theo kỹ năng, định hướng và cách bạn muốn làm việc. Nhà tuyển dụng tìm thấy ứng viên qua năng lực thật.</p>
+          <div class="home-actions"><button class="home-primary" data-open="register">Tạo hồ sơ miễn phí <span>↗</span></button><a class="home-secondary" href="#how">Khám phá cách hoạt động <span>↓</span></a></div>
+          <div class="home-values"><span><b>01</b> Kỹ năng trước chức danh</span><span><b>02</b> Minh bạch về độ phù hợp</span><span><b>03</b> Bạn kiểm soát hồ sơ</span></div>
+        </div>
+        <div class="product-stage" aria-label="Minh họa giao diện cơ hội nghề nghiệp">
+          <div class="stage-orbit"></div><div class="stage-spark spark-one">✳</div><div class="stage-spark spark-two">+</div>
+          <article class="opportunity-card">
+            <div class="opportunity-top"><span class="company-mark" aria-hidden="true">N</span><span class="sample-label">VÍ DỤ MINH HỌA</span><span aria-hidden="true" class="save-mark">♡</span></div>
+            <p class="opportunity-type">THIẾT KẾ SẢN PHẨM · THỰC TẬP</p><h2>Product Design Intern</h2><p class="opportunity-company">Northstar Studio <span>·</span> TP. Hồ Chí Minh</p>
+            <div class="opportunity-tags"><span>Figma</span><span>UX Research</span><span>Hybrid</span></div>
+            <div class="opportunity-note"><span>✦</span><p><strong>Vì sao có thể phù hợp?</strong><br>Kỹ năng và định hướng được trình bày rõ trước khi bạn ứng tuyển.</p></div>
+          </article>
+          <article class="profile-float"><div class="profile-float-head"><span class="mini-avatar">A</span><div><strong>Hồ sơ năng lực</strong><small>Được xây dựng theo cách của bạn</small></div><span class="profile-check">✓</span></div><div class="profile-line"><i></i></div><div class="profile-float-foot"><span>Kỹ năng</span><span>Học vấn</span><span>Mục tiêu</span></div></article>
+          <div class="stage-caption">THIẾT KẾ CHO CẢ HAI PHÍA <span>—</span> KETNOI</div>
+        </div>
       </div>
     </section>
 
-    <section class="process-section" id="opportunities"><div class="wrap process-wrap"><div class="eyebrow">MỘT HÀNH TRÌNH, HAI PHÍA</div><h2>Rõ ràng từ bước<br><span class="serif-accent">đầu tiên.</span></h2><div class="steps"><article><span class="step-no">01</span><div class="step-icon">◉</div><h3>Tạo hồ sơ của bạn</h3><p>Chia sẻ kỹ năng, trải nghiệm và điều bạn đang tìm kiếm.</p></article><article><span class="step-no">02</span><div class="step-icon">✳</div><h3>Khám phá sự phù hợp</h3><p>Nhận gợi ý việc làm và ứng viên theo tiêu chí thực tế.</p></article><article><span class="step-no">03</span><div class="step-icon">↗</div><h3>Cùng nhau kết nối</h3><p>Bắt đầu trò chuyện khi cả hai phía đều sẵn sàng.</p></article></div><div class="process-cta"><p>Cơ hội tốt không nên chỉ đến từ may mắn.</p><button class="btn btn-light btn-large" data-open="register">Tìm kết nối của bạn <span>↗</span></button></div></div></section>
+    <section class="principles" aria-label="Nguyên tắc kết nối"><div><span>01</span><strong>Năng lực nổi bật hơn từ khóa</strong></div><div><span>02</span><strong>Lý do kết nối rõ ràng</strong></div><div><span>03</span><strong>Quyền riêng tư do bạn chọn</strong></div></section>
 
-    <section class="quote-section wrap"><div class="eyebrow">BẮT ĐẦU TỪ HỒ SƠ CỦA BẠN</div><blockquote>Tìm kiếm cơ hội phù hợp với kỹ năng, mục tiêu và cách làm việc bạn mong muốn.</blockquote><button class="btn btn-primary btn-large" data-open="register">Tạo hồ sơ ngay <span>↗</span></button></section>
+    <section class="audience-section" id="candidates">
+      <div class="section-intro"><p class="home-kicker">MỘT NỀN TẢNG, HAI PHÍA</p><h2>Kết nối bắt đầu<br>từ <em>hiểu đúng.</em></h2><p>Mỗi bên có một mục tiêu riêng. Ketnoi giúp cuộc gặp đầu tiên bắt đầu từ thông tin có ý nghĩa.</p></div>
+      <div class="audience-grid">
+        <article class="audience-card student-card"><div class="audience-index">DÀNH CHO SINH VIÊN <span>01</span></div><div class="audience-symbol">↗</div><h3>Đừng chỉ tìm một<br>công việc bất kỳ.</h3><p>Thể hiện kỹ năng, trải nghiệm và điều bạn đang hướng tới. Khám phá cơ hội có liên quan để tự tin chọn bước tiếp theo.</p><button class="audience-link" data-open="register">Tạo hồ sơ sinh viên <span>↗</span></button><div class="audience-foot"><span>HỒ SƠ CỦA BẠN</span><b>Kỹ năng · Học vấn · Mục tiêu</b></div></article>
+        <article class="audience-card employer-card" id="employers"><div class="audience-index">DÀNH CHO NHÀ TUYỂN DỤNG <span>02</span></div><div class="audience-symbol">⌕</div><h3>Nhìn xa hơn<br>một bản CV.</h3><p>Khám phá ứng viên từ năng lực và định hướng. Bắt đầu cuộc trò chuyện với kỳ vọng rõ ràng ở cả hai phía.</p><button class="audience-link" data-open="employer">Tạo tài khoản tuyển dụng <span>↗</span></button><div class="audience-foot"><span>HỒ SƠ MINH HỌA</span><b>Frontend · UI/UX · Data</b></div></article>
+      </div>
+    </section>
+
+    <section class="how-section" id="how"><div class="how-inner"><div class="how-heading"><p class="home-kicker">BẮT ĐẦU THẬT ĐƠN GIẢN</p><h2>Một bước nhỏ.<br><em>Một hướng đi mới.</em></h2><p>Không cần có sẵn một bản CV hoàn hảo. Bắt đầu từ những gì bạn biết và muốn làm.</p></div><div class="how-steps"><article><span>01</span><div><h3>Cho biết điều bạn có</h3><p>Thêm kỹ năng, học vấn và trải nghiệm vào hồ sơ.</p></div></article><article><span>02</span><div><h3>Nói rõ điều bạn tìm</h3><p>Chọn lĩnh vực, vị trí, hình thức và địa điểm mong muốn.</p></div></article><article><span>03</span><div><h3>Chủ động bước tiếp</h3><p>Xem thông tin phù hợp và kết nối khi bạn sẵn sàng.</p></div></article></div></div></section>
+
+    <section class="closing-cta"><div><p class="home-kicker">BƯỚC TIẾP THEO LÀ CỦA BẠN</p><h2>Sẵn sàng tìm điều<br><em>phù hợp hơn?</em></h2></div><button class="home-primary" data-open="register">Bắt đầu với Ketnoi <span>↗</span></button></section>
   </main>
-  <footer class="footer"><div class="wrap footer-inner"><a class="brand" href="/"><span class="brand-mark">k</span><span>ketnoi<span class="brand-dot">.</span></span></a><p>Kết nối đúng người. Mở ra đúng cơ hội.</p><span>© 2026 Ketnoi. Made for your next step.</span></div></footer>
+  <footer class="footer site-footer"><div class="footer-top"><a class="brand" href="/"><span class="brand-mark">k</span><span>ketnoi<span class="brand-dot">.</span></span></a><p>Kết nối đúng người.<br>Mở ra đúng cơ hội.</p><div class="footer-links"><a href="#candidates">Sinh viên</a><a href="#employers">Nhà tuyển dụng</a><a href="#how">Cách hoạt động</a></div><button class="footer-login" data-open="login">Đăng nhập <span>↗</span></button></div><div class="footer-bottom"><span>© 2026 Ketnoi</span><span>Nền tảng kết nối nghề nghiệp hai chiều</span><span>Được thiết kế tại Việt Nam</span></div></footer>
 
   <div class="modal-backdrop" id="auth-modal" hidden><section class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button class="modal-close" id="modal-close" aria-label="Đóng">×</button><div class="modal-brand"><span class="brand-mark">k</span></div><div id="modal-content"></div></section></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
