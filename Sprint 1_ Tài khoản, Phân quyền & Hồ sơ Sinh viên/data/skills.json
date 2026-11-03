@@ -1,0 +1,13 @@
+[
+  { "name": "JavaScript", "aliases": ["js", "ecmascript"], "group": "Programming" },
+  { "name": "TypeScript", "aliases": ["ts"], "group": "Programming" },
+  { "name": "React", "aliases": ["react.js", "reactjs"], "group": "Frontend" },
+  { "name": "Node.js", "aliases": ["node", "nodejs"], "group": "Backend" },
+  { "name": "Python", "aliases": ["py"], "group": "Programming" },
+  { "name": "Java", "aliases": [], "group": "Programming" },
+  { "name": "SQL", "aliases": ["structured query language"], "group": "Data" },
+  { "name": "Figma", "aliases": [], "group": "Design" },
+  { "name": "Giao tiếp", "aliases": ["communication", "kỹ năng giao tiếp"], "group": "Soft skills" },
+  { "name": "Phân tích dữ liệu", "aliases": ["data analysis", "data analytics"], "group": "Data" },
+  { "name": "Git", "aliases": ["git version control"], "group": "Tools" }
+]

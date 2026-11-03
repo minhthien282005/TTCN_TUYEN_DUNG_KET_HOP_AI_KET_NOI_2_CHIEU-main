@@ -1,0 +1,16 @@
+BEGIN;
+DROP TABLE IF EXISTS audit_events;
+DROP TABLE IF EXISTS student_skills;
+DROP TABLE IF EXISTS skills;
+DROP TABLE IF EXISTS student_languages;
+DROP TABLE IF EXISTS student_projects;
+DROP TABLE IF EXISTS student_experiences;
+DROP TABLE IF EXISTS student_education;
+DROP TABLE IF EXISTS student_preferences;
+DROP TABLE IF EXISTS student_profiles;
+DROP TABLE IF EXISTS reference_categories;
+DROP TABLE IF EXISTS consents;
+DROP TABLE IF EXISTS account_tokens;
+DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS users;
+COMMIT;

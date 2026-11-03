@@ -1,0 +1,39 @@
+.forgot-back{margin:4px 0!important;text-align:right!important}
+.danger-button{color:#a24b3c;border-color:#ecd0ca;margin-top:14px}
+@media(max-width:800px){.desktop-nav.mobile-open{display:flex;position:absolute;z-index:5;top:68px;left:0;right:0;margin:0;padding:18px 22px;background:#f8f8f5;border-bottom:1px solid #e7e8e1;justify-content:center;gap:22px}.desktop-nav.mobile-open a{font-size:12px}}
+
+/* Keep Vietnamese glyphs on reliable local fonts; avoid downloaded font fallbacks. */
+:root{--sans:Arial,Helvetica,sans-serif;--display:Arial,Helvetica,sans-serif;--serif:Arial,Helvetica,sans-serif}
+body{font-family:var(--sans);font-size:15px;text-rendering:optimizeLegibility}
+.serif-accent{font-style:normal;font-weight:700;letter-spacing:-1.5px!important}
+.hero h1{font-size:clamp(50px,4.7vw,62px);letter-spacing:-2.6px;line-height:1.1}
+.hero-lead{font-size:17px;line-height:1.75;max-width:520px;color:#5e665e}
+.eyebrow{font-size:10px;letter-spacing:1.1px}
+.desktop-nav a{font-size:14px}
+.btn-small{font-size:13px}.btn-large{font-size:15px}
+.text-link{font-size:13px}.button-link{border:0;background:transparent;padding:13px 0;cursor:pointer;font-family:inherit}
+.hero-proof p{font-size:12px}.hero-proof p strong{font-size:13px}
+.proof-check{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:#e7edd8;color:#58713d;font-weight:700}
+.card-label{font-size:10px}.job-card h3{font-size:17px}.job-card p{font-size:11px}.skill-pills span{font-size:10px}.card-reason{font-size:11px}
+.match-score strong{font-size:17px}.match-score span{font-size:10px}
+.floating-note strong{font-size:11px}.floating-note small{font-size:10px}
+.trust-strip>span{font-size:10px}.trust-logos{gap:36px}.trust-logos .logo-word{font:600 14px var(--sans);color:#697165;opacity:1}
+.section-heading>p{font-size:15px;color:#626a61}.feature-kicker{font-size:10px;letter-spacing:1px}
+.feature-card h3{font-size:30px}.feature-card p{font-size:14px;line-height:1.7}.feature-link{font-size:13px}
+.feature-visual strong,.candidate-row strong{font-size:11px}.feature-visual small,.candidate-row small{font-size:10px}
+.process-wrap h2,.section-heading h2{letter-spacing:-1.8px}.steps h3{font-size:16px}.steps p{font-size:13px;line-height:1.7}
+.process-cta p{font:500 16px var(--sans)}
+.quote-section blockquote{font:500 24px/1.55 var(--sans);letter-spacing:-.3px}
+.quote-section .btn{margin-top:22px}
+.footer p{font:400 13px var(--sans)}
+@media(max-width:800px){.hero h1{font-size:clamp(48px,9vw,64px)}.hero-lead{font-size:16px}.trust-logos{gap:20px}}
+@media(max-width:520px){.hero h1{font-size:48px;letter-spacing:-1.8px}.hero-lead{font-size:15px}.trust-logos .logo-word{font-size:12px}.feature-card p{font-size:13px}.quote-section blockquote{font-size:20px}}
+.profile-section{border:1px solid #e8eae2;border-radius:7px;padding:0 14px;margin:12px 0;background:#fff}
+.profile-section>summary{padding:13px 0;color:#485047;font-size:13px;font-weight:700;cursor:pointer}
+.profile-section .profile-form-grid{padding-bottom:7px}
+.onboarding-actions{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:18px}
+.modal-submit:disabled{opacity:.65;cursor:wait}
+.mobile-menu[aria-expanded="true"]{background:#e8eddf;border-radius:5px}
+.candidate-demo-label{display:block;font-size:8px;letter-spacing:1px;color:#90978a;padding:3px 0 1px}
+details.profile-section:focus-within{border-color:#c5d4a4}
+@media(max-width:520px){.onboarding-actions{flex-wrap:wrap}.onboarding-actions .btn{flex:1}}

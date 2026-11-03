@@ -1,0 +1,17 @@
+name: Sprint 1 checks
+# GitHub only discovers workflows inside .github/workflows at the repository root.
+on:
+  push:
+  pull_request:
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node --check "Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/server.js"
+      - run: node --check "Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/app.js"
+      - run: node --check "Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/scripts/backup.js"
+      - run: node -e "JSON.parse(require('node:fs').readFileSync('Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/data/skills.json', 'utf8'))"

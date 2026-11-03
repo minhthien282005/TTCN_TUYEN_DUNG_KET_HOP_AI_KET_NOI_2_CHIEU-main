@@ -1,0 +1,230 @@
+openapi: 3.1.0
+info:
+  title: Ketnoi Sprint 1 API
+  version: 1.0.0
+  description: Account, session, student profile, taxonomy and consent API. Local prototype uses an HttpOnly session cookie.
+servers:
+  - url: http://localhost:3000
+tags:
+  - name: Account
+  - name: Profile
+  - name: Reference
+paths:
+  /api/register:
+    post:
+      tags: [Account]
+      summary: Create a student or employer account and record consent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, role, consent]
+              properties:
+                name: { type: string, maxLength: 100 }
+                email: { type: string, format: email, maxLength: 254 }
+                password: { type: string, minLength: 8, maxLength: 128 }
+                role: { type: string, enum: [student, employer] }
+                consent: { type: boolean, const: true }
+      responses:
+        '201': { description: Account created; local mode includes a development verification URL }
+        '400': { description: Invalid input }
+        '409': { description: Email already exists }
+  /api/verify:
+    get:
+      tags: [Account]
+      summary: Verify an email using a single-use 15 minute token
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Email verified }
+        '400': { description: Invalid or expired token }
+  /api/resend-verification:
+    post:
+      tags: [Account]
+      summary: Request a fresh verification link without revealing whether the account exists
+      responses:
+        '200': { description: Generic response; local mode may return a development URL }
+        '400': { description: Invalid email }
+  /api/login:
+    post:
+      tags: [Account]
+      summary: Sign in and issue a seven day session cookie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, maxLength: 128 }
+      responses:
+        '200': { description: Signed in; Set-Cookie sid is HttpOnly and SameSite=Lax }
+        '401': { description: Invalid credentials }
+        '403': { description: Email is not verified }
+        '429': { description: Temporary lock after five failed attempts or request rate limit }
+  /api/logout:
+    post:
+      tags: [Account]
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: Session revoked }
+  /api/refresh:
+    post:
+      tags: [Account]
+      security: [{ sessionCookie: [] }]
+      summary: Rotate the current session and extend expiry by seven days
+      responses:
+        '200': { description: Rotated session cookie }
+        '401': { description: Session expired }
+  /api/forgot-password:
+    post:
+      tags: [Account]
+      summary: Request a reset link (15 minute single-use token)
+      responses:
+        '200': { description: Generic response to avoid account enumeration; local mode includes development URL }
+        '400': { description: Invalid email }
+  /api/reset-password:
+    post:
+      tags: [Account]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, password]
+              properties:
+                token: { type: string }
+                password: { type: string, minLength: 8, maxLength: 128 }
+      responses:
+        '200': { description: Password changed and existing sessions revoked }
+        '400': { description: Invalid or expired token }
+  /api/change-password:
+    post:
+      tags: [Account]
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: Password changed; all sessions revoked }
+        '401': { description: Authentication required }
+  /api/change-email:
+    post:
+      tags: [Account]
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: Email changed and re-verification required }
+        '409': { description: Email already in use }
+  /api/me:
+    get:
+      tags: [Account]
+      responses:
+        '200': { description: Current public account or null }
+  /api/categories:
+    get:
+      tags: [Reference]
+      responses:
+        '200': { description: Industry, school, location and skill choices }
+  /api/skills/normalize:
+    post:
+      tags: [Reference]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [skills]
+              properties:
+                skills: { type: array, maxItems: 100, items: { type: string } }
+      responses:
+        '200': { description: Skills mapped through canonical names and aliases }
+        '400': { description: Invalid list }
+  /api/profile:
+    get:
+      tags: [Profile]
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: Current student's profile }
+        '401': { description: Authentication required }
+        '403': { description: Student role required }
+    put:
+      tags: [Profile]
+      security: [{ sessionCookie: [] }]
+      summary: Replace the authenticated student's profile fields
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [profile]
+              properties:
+                profile: { type: object, description: Only the authenticated user's profile is writable; see Sprint 1 schema docs. }
+      responses:
+        '200': { description: Saved profile }
+        '400': { description: Invalid profile values }
+        '401': { description: Authentication required }
+        '403': { description: Student role required }
+    patch:
+      tags: [Profile]
+      security: [{ sessionCookie: [] }]
+      summary: Merge supplied profile fields into the authenticated student's profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [profile]
+              properties:
+                profile: { type: object }
+      responses:
+        '200': { description: Updated profile }
+        '401': { description: Authentication required }
+        '403': { description: Student role required }
+  /api/consents:
+    get:
+      tags: [Account]
+      security: [{ sessionCookie: [] }]
+      responses:
+        '200': { description: Consent history for the authenticated account }
+        '401': { description: Authentication required }
+    post:
+      tags: [Account]
+      security: [{ sessionCookie: [] }]
+      summary: Record a purpose and version specific consent decision
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [purpose, granted]
+              properties:
+                purpose: { type: string, enum: [account_profile, matching, model_evaluation] }
+                granted: { type: boolean }
+                version: { type: string, maxLength: 20 }
+      responses:
+        '201': { description: Consent decision appended to history }
+        '400': { description: Invalid purpose or decision }
+        '401': { description: Authentication required }
+  /api/account:
+    delete:
+      tags: [Account]
+      security: [{ sessionCookie: [] }]
+      summary: Soft delete authenticated account and revoke sessions
+      responses:
+        '200': { description: Account marked deleted and personal profile cleared }
+        '401': { description: Authentication required }
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: sid

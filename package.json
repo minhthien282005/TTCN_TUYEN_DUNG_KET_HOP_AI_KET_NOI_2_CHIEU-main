@@ -1,0 +1,12 @@
+{
+  "name": "ket-noi-hai-chieu",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Prototype web tuyển dụng thông minh — Sprint 1",
+  "scripts": {
+    "start": "node \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/server.js\"",
+    "dev": "node --watch \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/server.js\"",
+    "check": "node --check \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/server.js\" && node --check \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/app.js\" && node --check \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/scripts/backup.js\""
+  },
+  "engines": { "node": ">=20" }
+}
