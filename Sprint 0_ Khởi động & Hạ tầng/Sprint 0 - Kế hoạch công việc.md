@@ -45,7 +45,7 @@
 
 ## Tiêu chí hoàn thành (Definition of Done)
 
-- Nhóm duyệt SRS/backlog ưu tiên, wireframe và ERD mức tổng quan.
+- Duyệt SRS/backlog ưu tiên, wireframe và ERD mức tổng quan.
 - Công nghệ và kiến trúc nền tảng được chốt; thay đổi về sau cần ghi rõ lý do.
 - Thành viên mới có thể làm theo hướng dẫn để dựng toàn bộ môi trường dev bằng một lệnh.
 - CI chạy thành công trên repository.
@@ -61,7 +61,3 @@
 | Thiếu dữ liệu CV/job hoặc quyền dùng dữ liệu | Dùng dữ liệu giả lập/ẩn danh; không đưa dữ liệu cá nhân thật vào repo. |
 | Phụ thuộc API LLM, email hoặc lưu trữ ngoài chưa sẵn sàng | Ghi rõ phụ thuộc, cung cấp cấu hình mock/fallback để môi trường dev vẫn chạy. |
 | Phạm vi Sprint 0 phình sang triển khai tính năng | Giới hạn ở nền tảng, thiết kế và thử nghiệm kỹ thuật; tính năng người dùng chuyển backlog Sprint sau. |
-
-## Tham chiếu
-
-Nội dung được tổng hợp từ tài liệu **PHÂN TÍCH VÀ THIẾT KẾ DỰ ÁN**, phần kế hoạch Sprint 0 (trang 53–55), cùng các ghi chú về SYS-08/SYS-09 ở trang 71. Sprint 0 kéo dài 1 tuần; các đầu việc trên là kế hoạch chuẩn bị, không thay thế phạm vi chức năng của Sprint 1.
