@@ -37,6 +37,14 @@ Kiểm thử tích hợp dùng scanner fixture giả chỉ trong data directory 
 - Queue lưu trong JSON và worker nằm cùng tiến trình; chưa có BullMQ/shared worker cho nhiều instance. File CV dùng local disk; chưa có object storage, retention job hoặc quy trình production cho dữ liệu cá nhân.
 - Cần QA bằng CV mẫu có đồng ý, PDF nhiều cột/encoding, malware test file trong môi trường scanner an toàn, OCR với gói ngôn ngữ thực, xử lý restart/backup và kiểm thử tải trước khi staging.
 
+## Kết quả kiểm tra lần bàn giao
+
+- `npm.cmd run check`: đạt.
+- `npm.cmd run test:sprint3`: đạt 4/4; gồm parser/taxonomy/vector, cấu hình Ollama an toàn, fixture CV tổng hợp và luồng upload/review/confirm/retry.
+- `npm.cmd run test:sprint2`: đạt 5/5; tìm kiếm 10.000 tin có p95 71.4 ms trong lần chạy bàn giao.
+- ClamAV, Tesseract, Poppler, PostgreSQL và Ollama không được cài trong môi trường kiểm tra này. Scanner giả chỉ dùng trong test cô lập, không xác nhận khả năng quét virus thật.
+- Trạng thái bàn giao: prototype local để demo/review; chưa nghiệm thu production. Cần cấu hình ClamAV trước khi upload CV thật.
+
 ## Xác nhận
 
 **Người bàn giao:** ____________________  
