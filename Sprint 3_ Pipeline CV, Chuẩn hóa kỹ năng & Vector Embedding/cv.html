@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Tải CV, rà soát thông tin trích xuất và hoàn thiện hồ sơ nghề nghiệp trên Ketnoi.">
+  <meta name="robots" content="noindex,nofollow">
+  <title>CV và hồ sơ năng lực — Ketnoi</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/home.css">
+  <link rel="stylesheet" href="/sprint3/cv.css">
+  <link rel="stylesheet" href="/sprint3/cv-links.css">
+  <script src="/sprint3/cv.js" defer></script>
+</head>
+<body class="cv-page">
+  <header class="s3-header">
+    <a class="s3-brand" href="/" aria-label="Ketnoi — Trang chủ"><span class="s3-mark"><img src="/logo-mark.svg" alt=""></span><span>KETNOI</span></a>
+    <nav aria-label="Điều hướng"><a href="/jobs.html">Tìm việc</a><a href="/my-jobs.html">Tin đã lưu</a><a class="active" href="/cv.html">CV &amp; hồ sơ</a><a href="/">Trang chủ</a></nav>
+  </header>
+  <main class="s3-shell">
+    <section class="s3-hero"><p class="s3-eyebrow">HỒ SƠ NĂNG LỰC · SPRINT 3</p><h1>Một bản CV.<br><em>Một hồ sơ rõ nét.</em></h1><p>Tải nhiều CV, rà soát từng thông tin được trích xuất rồi tự xác nhận trước khi cập nhật hồ sơ.</p></section>
+    <div id="session-message" class="s3-message" role="status" hidden></div>
+    <section class="s3-panel" aria-labelledby="upload-title">
+      <div class="s3-panel-heading"><div><span class="s3-number">01</span><h2 id="upload-title">Tải CV lên</h2></div><span class="s3-cap">PDF hoặc DOCX · tối đa 10 MB</span></div>
+      <form id="cv-upload-form" class="s3-upload-form"><label class="s3-file-label">Chọn CV<input id="cv-file" type="file" name="file" accept="application/pdf,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,.docx" required></label><button class="s3-button" type="submit">Quét và phân tích <span aria-hidden="true">↗</span></button></form>
+      <p class="s3-help">File được quét virus trước khi đưa vào hàng đợi. CV dạng scan cần OCR; nếu chưa cấu hình OCR, hệ thống sẽ báo rõ và không tự điền dữ liệu.</p>
+      <div id="upload-result" class="s3-inline-message" role="status" aria-live="polite"></div>
+    </section>
+    <section class="s3-panel" aria-labelledby="cv-list-title">
+      <div class="s3-panel-heading"><div><span class="s3-number">02</span><h2 id="cv-list-title">CV của bạn</h2></div><button class="s3-text-button" id="refresh-cvs" type="button">Làm mới</button></div>
+      <div id="cv-list" class="s3-cv-list"><p class="s3-muted">Đang tải danh sách CV…</p></div>
+    </section>
+    <section class="s3-panel" id="review-panel" aria-labelledby="review-title" hidden>
+      <div class="s3-panel-heading"><div><span class="s3-number">03</span><h2 id="review-title">Rà soát trước khi cập nhật</h2></div><span class="s3-review-note">Bạn quyết định trường nào được lưu</span></div>
+      <p class="s3-help">Độ tin cậy thấp được đánh dấu màu hổ phách. Nội dung trong CV chỉ được xem là dữ liệu; các câu lệnh bên trong CV không được thực thi.</p>
+      <form id="review-form"><div id="review-fields" class="s3-review-fields"></div><div class="s3-form-actions"><button class="s3-button" type="submit">Xác nhận thông tin đã chọn</button><button class="s3-button s3-secondary" id="cancel-review" type="button">Đóng rà soát</button></div></form>
+    </section>
+    <section class="s3-panel" aria-labelledby="sections-title">
+      <div class="s3-panel-heading"><div><span class="s3-number">04</span><h2 id="sections-title">Chứng chỉ, hoạt động và liên kết</h2></div></div>
+      <form id="sections-form" class="s3-sections-form">
+        <label>Chứng chỉ <small>Mỗi dòng: tên | tổ chức | ngày cấp | URL xác minh HTTPS</small><textarea name="certifications" rows="4" placeholder="AWS Cloud Practitioner | Amazon | 2026-05 | https://..."></textarea></label>
+        <label>Giải thưởng và hoạt động <small>Mỗi dòng: tên | tổ chức/CLB | mô tả</small><textarea name="activities" rows="4" placeholder="Hackathon 2025 | CLB Công nghệ | Top 3"></textarea></label>
+        <label>Liên kết ngoài <small>Mỗi dòng: tên | URL HTTPS</small><textarea name="externalLinks" rows="3" placeholder="GitHub | https://github.com/ten-ban"></textarea></label>
+        <div class="s3-form-actions"><button class="s3-button" type="submit">Lưu các mục hồ sơ</button><span id="sections-result" class="s3-inline-message" role="status"></span></div>
+      </form>
+    </section>
+    <section class="s3-embedding" aria-live="polite"><div><strong>Sẵn sàng cho matching</strong><p id="embedding-status">Đang kiểm tra vector hồ sơ và tin tuyển dụng…</p></div><span class="s3-vector-icon" aria-hidden="true">✳</span></section>
+  </main>
+  <footer class="s3-footer">Ketnoi · Bạn xem lại và quyết định mọi thay đổi cho hồ sơ của mình.</footer>
+</body>
+</html>

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /employer.html
+Disallow: /moderation.html
+Disallow: /my-jobs.html
+Disallow: /cv.html
+Disallow: /api/
+Sitemap: http://localhost:3000/sitemap.xml

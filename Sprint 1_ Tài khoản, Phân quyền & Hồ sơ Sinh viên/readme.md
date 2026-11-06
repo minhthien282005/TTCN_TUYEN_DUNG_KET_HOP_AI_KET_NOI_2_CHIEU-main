@@ -15,6 +15,7 @@ Chạy từ thư mục gốc bằng `npm.cmd start`; không chạy server từ t
 
 - [Kế hoạch công việc](Sprint%201%20-%20K%E1%BA%BF%20ho%E1%BA%A1ch%20c%C3%B4ng%20vi%E1%BB%87c.md)
 - [Trạng thái bàn giao](docs/delivery-status.md)
+- [Biên bản bàn giao Sprint 1](docs/ban-giao.md)
 - [OpenAPI](docs/openapi.yaml)
 - [ERD và thiết kế UX](docs/design-and-erd.md)
 - [QA checklist và demo](docs/qa-checklist.md)

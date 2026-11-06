@@ -2,6 +2,8 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const sprint2Api = require('../Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/api');
+const sprint3Api = require('../Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding/api');
 
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
@@ -12,12 +14,12 @@ const TOKEN_PEPPER = process.env.TOKEN_PEPPER || 'local-prototype-only';
 const APP_BASE_URL = process.env.APP_BASE_URL || `http://localhost:${PORT}`;
 const skillTaxonomy = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'skills.json'), 'utf8'));
 fs.mkdirSync(DATA_DIR, { recursive: true });
-if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, JSON.stringify({ users: [], sessions: [], consents: [], audit: [] }, null, 2));
+if (!fs.existsSync(DB_FILE)) fs.writeFileSync(DB_FILE, JSON.stringify({ users: [], sessions: [], consents: [], audit: [], companies: [], jobs: [] }, null, 2));
 if (process.env.NODE_ENV === 'production' && (!process.env.RESEND_API_KEY || !process.env.MAIL_FROM || !process.env.TOKEN_PEPPER || !process.env.APP_BASE_URL)) {
   throw new Error('Production requires RESEND_API_KEY, MAIL_FROM, TOKEN_PEPPER and APP_BASE_URL.');
 }
 let db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-for (const key of ['users', 'sessions', 'consents', 'audit']) db[key] ||= [];
+for (const key of ['users', 'sessions', 'consents', 'audit', 'companies', 'jobs']) db[key] ||= [];
 let dataUpgraded = false;
 for (const session of db.sessions) {
   if (session.token && !session.tokenHash) { session.tokenHash = crypto.createHmac('sha256', TOKEN_PEPPER).update(session.token).digest('hex'); delete session.token; dataUpgraded = true; }
@@ -25,7 +27,7 @@ for (const session of db.sessions) {
 for (const account of db.users) {
   if (account.verifyToken && !account.verifyTokenHash) { account.verifyTokenHash = crypto.createHmac('sha256', TOKEN_PEPPER).update(account.verifyToken).digest('hex'); delete account.verifyToken; dataUpgraded = true; }
   if (account.resetToken && !account.resetTokenHash) { account.resetTokenHash = crypto.createHmac('sha256', TOKEN_PEPPER).update(account.resetToken).digest('hex'); delete account.resetToken; dataUpgraded = true; }
-  if (account.profile) for (const key of ['education', 'desiredRoles', 'jobTypes', 'experiences', 'projects', 'languages', 'skills']) account.profile[key] ||= [];
+  if (account.profile) for (const key of ['education', 'desiredRoles', 'jobTypes', 'experiences', 'projects', 'languages', 'skills', 'certifications', 'activities', 'externalLinks']) account.profile[key] ||= [];
 }
 const attempts = new Map();
 const requestWindows = new Map();
@@ -89,7 +91,8 @@ function cookieValue(req, name) {
 function authUser(req) {
   const token = cookieValue(req, 'sid');
   const session = db.sessions.find(s => (s.tokenHash === tokenHash(token) || s.token === token) && s.expiresAt > Date.now());
-  return session ? db.users.find(u => u.id === session.userId) : null;
+  const account = session ? db.users.find(u => u.id === session.userId) : null;
+  return account && !account.lockedAt && !account.deletedAt ? account : null;
 }
 function readBody(req) {
   return new Promise((resolve, reject) => {
@@ -119,6 +122,10 @@ async function api(req, res, url) {
     if (!Array.isArray(body.skills) || body.skills.length > 100) return json(res, 400, { error: 'skills cần là danh sách tối đa 100 phần tử.' });
     return json(res, 200, { skills: [...new Set(body.skills.map(normalizeSkill).filter(Boolean))] });
   }
+  const sprint2Response = await sprint2Api(req, res, url, user, { db, save, audit, tokenHash, sendMail, appBaseUrl: APP_BASE_URL, onJobChanged: job => sprint3Api.embedJob(db, job, save) });
+  if (sprint2Response !== null) return;
+  const sprint3Response = await sprint3Api.handleRequest(req, res, url, user, { db, save, audit });
+  if (sprint3Response !== null) return;
   if (req.method === 'GET' && url.pathname === '/api/me') return json(res, 200, { user: user ? publicUser(user) : null });
   if (req.method === 'POST' && url.pathname === '/api/register') {
     const body = await readBody(req);
@@ -195,6 +202,7 @@ async function api(req, res, url) {
       attempts.set(key, entry); audit(account?.id || null, 'account.login_failed'); save(); return json(res, 401, { error: 'Email hoặc mật khẩu chưa chính xác.' });
     }
     attempts.delete(key);
+    if (account.lockedAt) return json(res, 403, { error: 'Tài khoản đang bị khóa. Liên hệ quản trị viên để được hỗ trợ.' });
     if (!account.verified) return json(res, 403, { error: 'Hãy xác minh email trước khi đăng nhập.' });
     const token = crypto.randomBytes(32).toString('hex');
     db.sessions = db.sessions.filter(s => s.expiresAt > Date.now() && s.userId !== account.id);
@@ -274,16 +282,21 @@ async function api(req, res, url) {
       gradYear, gpa, location: cleanText(profile.location, 100),
       bio: cleanText(profile.bio, 1000), desiredRoles: boundedList(profile.desiredRoles, 10, 120), jobTypes: boundedList(profile.jobTypes, 5, 50),
       education: boundedList(profile.education), skills: boundedList(profile.skills, 40, 80).map(normalizeSkill), experiences: boundedList(profile.experiences), projects: boundedList(profile.projects), languages: boundedList(profile.languages, 10, 80),
+      certifications: Array.isArray(user.profile?.certifications) ? user.profile.certifications : [],
+      activities: Array.isArray(user.profile?.activities) ? user.profile.activities : [],
+      externalLinks: Array.isArray(user.profile?.externalLinks) ? user.profile.externalLinks : [],
       onboardingCompleted: Boolean(profile.onboardingCompleted),
       visibility: ['public', 'invited', 'private'].includes(profile.visibility) ? profile.visibility : 'private', updatedAt: new Date().toISOString()
     };
     audit(user.id, 'profile.update', 'student_profile'); save();
+    sprint3Api.embedProfile(db, user, save);
     return json(res, 200, { profile: user.profile });
   }
   if (req.method === 'DELETE' && url.pathname === '/api/account') {
     const body = await readBody(req);
     if (body.confirm !== true) return json(res, 400, { error: 'Cần xác nhận xóa tài khoản.' });
     user.deletedAt = new Date().toISOString(); user.email = `deleted-${user.id}@invalid.local`; user.name = 'Tài khoản đã xóa'; user.profile = {};
+    await sprint3Api.deleteUserData(db, user);
     db.sessions = db.sessions.filter(s => s.userId !== user.id); audit(user.id, 'account.delete'); save();
     return json(res, 200, { message: 'Tài khoản đã được xóa mềm.' }, { 'Set-Cookie': clearCookie() });
   }
@@ -304,9 +317,32 @@ const server = http.createServer(async (req, res) => {
   try {
     if (url.pathname.startsWith('/api/')) return await api(req, res, url);
     if (req.method !== 'GET' && req.method !== 'HEAD') return json(res, 405, { error: 'Method not allowed.' });
+    const escapeHtml = value => String(value || '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+    const seoJob = url.pathname.match(/^\/jobs\/[^/]+--([\da-f-]{36})$/i);
+    if (seoJob) {
+      const job = db.jobs.find(item => item.id === seoJob[1] && item.status === 'published' && (!item.expiresAt || Date.parse(item.expiresAt) > Date.now()));
+      const company = job && db.companies.find(item => item.id === job.companyId && item.verificationStatus === 'verified');
+      if (!job || !company) return json(res, 404, { error: 'Không tìm thấy tin tuyển dụng.' });
+      const structured = { '@context': 'https://schema.org', '@type': 'JobPosting', title: job.title, description: [job.description, job.requirements, job.benefits].filter(Boolean).join('\n\n'), datePosted: job.publishedAt, validThrough: job.expiresAt, employmentType: job.type === 'Toàn thời gian' ? 'FULL_TIME' : job.type === 'Bán thời gian' ? 'PART_TIME' : job.type === 'Thực tập' ? 'INTERN' : 'CONTRACTOR', hiringOrganization: { '@type': 'Organization', name: company.name, sameAs: company.website || undefined }, jobLocation: { '@type': 'Place', address: { '@type': 'PostalAddress', addressLocality: job.location, addressCountry: 'VN' } }, ...(job.workMode === 'Từ xa' ? { jobLocationType: 'TELECOMMUTE', applicantLocationRequirements: { '@type': 'Country', name: 'Vietnam' } } : {}), ...(job.salaryMin || job.salaryMax ? { baseSalary: { '@type': 'MonetaryAmount', currency: 'VND', value: { '@type': 'QuantitativeValue', minValue: job.salaryMin || undefined, maxValue: job.salaryMax || undefined, unitText: 'MONTH' } } } : {}) };
+      const jsonLd = JSON.stringify(structured).replace(/</g, '\\u003c');
+      const html = `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(job.title)} — ${escapeHtml(company.name)} | Ketnoi</title><meta name="description" content="${escapeHtml(job.description.slice(0, 250))}"><link rel="canonical" href="${escapeHtml(`${APP_BASE_URL}${url.pathname}`)}"><link rel="stylesheet" href="/home.css"><link rel="stylesheet" href="/sprint2/sprint2.css"><link rel="stylesheet" href="/sprint2/detail.css"><script type="application/ld+json">${jsonLd}</script><script src="/sprint2/job.js" defer></script></head><body><header class="s2-header"><a class="brand" href="/"><span class="brand-mark"><img src="/logo-mark.svg" alt=""></span><span class="brand-wordmark">KETNOI</span></a><nav><a href="/jobs.html">Tìm việc</a><a href="/">Trang chủ</a></nav></header><main class="s2-shell"><a class="s2-back-link" href="/jobs.html">← Quay lại danh sách việc làm</a><div id="job-detail" class="s2-detail-layout"><p class="s2-muted">${escapeHtml(job.title)} · ${escapeHtml(company.name)} · ${escapeHtml(job.location)}</p></div></main><footer class="s2-footer">Ketnoi · Kết nối nghề nghiệp hai chiều</footer></body></html>`;
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=60' }); res.end(req.method === 'HEAD' ? undefined : html); return;
+    }
+    if (url.pathname === '/sitemap.xml') {
+      const jobs = db.jobs.filter(job => job.status === 'published' && (!job.expiresAt || Date.parse(job.expiresAt) > Date.now()) && db.companies.some(company => company.id === job.companyId && company.verificationStatus === 'verified'));
+      const entries = jobs.map(job => `<url><loc>${APP_BASE_URL}/jobs/${encodeURIComponent(job.slug || 'viec-lam')}--${job.id}</loc><lastmod>${new Date(job.updatedAt || job.publishedAt).toISOString().slice(0, 10)}</lastmod></url>`).join('');
+      const sitemap = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${APP_BASE_URL}/</loc></url><url><loc>${APP_BASE_URL}/jobs.html</loc></url>${entries}</urlset>`;
+      res.writeHead(200, { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=300' }); res.end(req.method === 'HEAD' ? undefined : sitemap); return;
+    }
+    if (url.pathname === '/robots.txt') {
+      const robots = `User-agent: *\nAllow: /\nDisallow: /employer.html\nDisallow: /moderation.html\nDisallow: /my-jobs.html\nDisallow: /cv.html\nDisallow: /api/\nSitemap: ${APP_BASE_URL}/sitemap.xml\n`;
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=300' }); res.end(req.method === 'HEAD' ? undefined : robots); return;
+    }
     const isSprintAsset = url.pathname === '/sprint1/app.js';
-    const assetRoot = isSprintAsset ? __dirname : PUBLIC;
-    const requested = isSprintAsset ? 'app.js' : url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
+    const isSprint2Asset = url.pathname.startsWith('/sprint2/') || ['/jobs.html', '/job.html', '/my-jobs.html', '/employer.html', '/moderation.html'].includes(url.pathname);
+    const isSprint3Asset = url.pathname.startsWith('/sprint3/') || url.pathname === '/cv.html';
+    const assetRoot = isSprintAsset ? __dirname : isSprint2Asset ? path.resolve(__dirname, '..', 'Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt') : isSprint3Asset ? path.resolve(__dirname, '..', 'Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding') : PUBLIC;
+    const requested = isSprintAsset ? 'app.js' : isSprint2Asset ? (url.pathname.startsWith('/sprint2/') ? decodeURIComponent(url.pathname.slice('/sprint2/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint3Asset ? (url.pathname.startsWith('/sprint3/') ? decodeURIComponent(url.pathname.slice('/sprint3/'.length)) : decodeURIComponent(url.pathname.slice(1))) : url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
     const target = path.resolve(assetRoot, requested);
     if (!target.startsWith(`${assetRoot}${path.sep}`) && target !== path.join(PUBLIC, 'index.html')) return json(res, 403, { error: 'Forbidden.' });
     fs.readFile(target, (err, content) => {
@@ -319,4 +355,12 @@ const server = http.createServer(async (req, res) => {
     json(res, 500, { error: 'Lỗi máy chủ. Vui lòng thử lại sau.' });
   }
 });
+const expirePublishedJobs = () => {
+  const now = Date.now(); let changed = false;
+  for (const job of db.jobs) if (job.status === 'published' && job.expiresAt && Date.parse(job.expiresAt) <= now) { job.status = 'expired'; job.updatedAt = new Date().toISOString(); changed = true; }
+  if (changed) { audit(null, 'job.auto_expire', 'jobs'); save(); }
+};
+expirePublishedJobs();
+setInterval(expirePublishedJobs, 60_000).unref();
+sprint3Api.startWorker({ db, save, audit });
 server.listen(PORT, () => console.log(`Ứng dụng đang chạy tại http://localhost:${PORT}`));

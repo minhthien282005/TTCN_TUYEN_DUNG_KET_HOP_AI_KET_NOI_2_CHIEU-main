@@ -2,11 +2,13 @@
   "name": "ket-noi-hai-chieu",
   "version": "0.1.0",
   "private": true,
-  "description": "Prototype web tuyển dụng thông minh — Sprint 1",
+  "description": "Prototype web tuyển dụng thông minh — Sprint 1–3",
   "scripts": {
     "start": "node \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/server.js\"",
     "dev": "node --watch \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/server.js\"",
-    "check": "node --check \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/server.js\" && node --check \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/app.js\" && node --check \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/scripts/backup.js\""
+    "test:sprint2": "node --test \"Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/tests/sprint2.integration.test.js\"",
+    "test:sprint3": "node --test \"Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding/tests/sprint3.integration.test.js\"",
+    "check": "node --check \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/server.js\" && node --check \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/app.js\" && node --check \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/scripts/backup.js\" && node --check \"Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/api.js\" && node --check \"Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/employer.js\" && node --check \"Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/jobs.js\" && node --check \"Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/job.js\" && node --check \"Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/my-jobs.js\" && node --check \"Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/moderation.js\" && node --check \"Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding/api.js\" && node --check \"Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding/cv.js\""
   },
   "engines": { "node": ">=20" }
 }
