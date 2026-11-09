@@ -17,19 +17,27 @@
   let activeCvId = '';
   let polling = false;
 
+  function lockPrivateCvUi() {
+    uploadForm.querySelectorAll('input, button').forEach(control => { control.disabled = true; });
+    $('#refresh-cvs').disabled = true;
+    $('#sections-form').querySelectorAll('input, textarea, button').forEach(control => { control.disabled = true; });
+    list.innerHTML = '<p class="s3-muted">Đăng nhập để xem danh sách CV của bạn.</p>';
+    $('#embedding-status').textContent = 'Đăng nhập để xem trạng thái hồ sơ.';
+  }
+
   async function ensureStudent() {
     const { user } = await api('/api/me');
     currentUser = user;
     if (!user) {
       sessionMessage.hidden = false;
-      sessionMessage.innerHTML = 'Đăng nhập tài khoản sinh viên để quản lý CV và hồ sơ. <a href="/">Đến trang chủ để đăng nhập hoặc tạo tài khoản ↗</a>';
-      uploadForm.querySelector('button').disabled = true;
+      sessionMessage.innerHTML = 'Đăng nhập tài khoản sinh viên để quản lý CV và hồ sơ. <a href="/?open=login&amp;next=%2Fcv.html">Đăng nhập để tiếp tục ↗</a>';
+      lockPrivateCvUi();
       return false;
     }
     if (user.role !== 'student') {
       sessionMessage.hidden = false;
       sessionMessage.textContent = 'Pipeline CV dành cho tài khoản sinh viên. Hãy đăng nhập bằng tài khoản sinh viên.';
-      uploadForm.querySelector('button').disabled = true;
+      lockPrivateCvUi();
       return false;
     }
     return true;

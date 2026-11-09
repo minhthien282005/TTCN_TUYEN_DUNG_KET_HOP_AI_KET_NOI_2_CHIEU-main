@@ -3,6 +3,7 @@ const modalContent = document.querySelector('#modal-content');
 const toast = document.querySelector('#toast');
 let currentUser = null;
 let categoryData = { industries: [], schools: [], locations: [], skills: [] };
+let authReturnPath = '';
 let toastTimer;
 let focusBeforeModal = null;
 
@@ -182,7 +183,7 @@ document.addEventListener('submit', async event => {
   if (event.target.id === 'login-form') {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.target));
-    try { const result = await request('/api/login', { method: 'POST', body: JSON.stringify(data) }); currentUser = result.user; updateNav(); if (currentUser.role === 'student' && !currentUser.profile?.onboardingCompleted) onboardingView(currentUser.profile || {}); else openDashboard(currentUser); showToast('Đăng nhập thành công.'); }
+    try { const result = await request('/api/login', { method: 'POST', body: JSON.stringify(data) }); currentUser = result.user; updateNav(); if (authReturnPath) { window.location.assign(authReturnPath); return; } if (currentUser.role === 'student' && !currentUser.profile?.onboardingCompleted) onboardingView(currentUser.profile || {}); else openDashboard(currentUser); showToast('Đăng nhập thành công.'); }
     catch (error) { loginView(error.message); }
   }
   if (event.target.id === 'forgot-form') {
@@ -259,5 +260,13 @@ async function init() {
   }
   const resetToken = new URLSearchParams(location.search).get('reset');
   if (resetToken) { history.replaceState({}, '', '/'); resetView(resetToken); }
+  const params = new URLSearchParams(location.search);
+  const nextPath = params.get('next') || '';
+  if (nextPath.startsWith('/') && !nextPath.startsWith('//')) authReturnPath = nextPath;
+  const openView = params.get('open');
+  if (openView === 'login' || openView === 'register') {
+    history.replaceState({}, '', '/');
+    if (openView === 'register') registerView(); else loginView();
+  }
 }
 init();
