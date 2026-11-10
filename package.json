@@ -2,7 +2,7 @@
   "name": "ket-noi-hai-chieu",
   "version": "0.1.0",
   "private": true,
-  "description": "Prototype web tuyển dụng thông minh — Sprint 1–4",
+  "description": "Prototype web tuyển dụng thông minh — Sprint 1–5",
   "scripts": {
     "start": "node \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/server.js\"",
     "dev": "node --watch \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/server.js\"",

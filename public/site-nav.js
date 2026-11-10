@@ -13,12 +13,16 @@
     ],
     student: [
       ['/jobs.html', 'Tìm việc'],
+      ['/matches.html', 'Gợi ý phù hợp'],
+      ['/ai-tools.html', 'AI hỗ trợ'],
       ['/cv.html', 'CV & hồ sơ'],
       ['/applications.html', 'Ứng tuyển'],
       ['/notifications.html', 'Thông báo']
     ],
     employer: [
       ['/employer.html', 'Đăng tuyển'],
+      ['/matches.html', 'Ứng viên phù hợp'],
+      ['/ai-tools.html', 'AI hỗ trợ'],
       ['/employer-profile.html', 'Hồ sơ doanh nghiệp'],
       ['/ats.html', 'Ứng viên'],
       ['/notifications.html', 'Thông báo']
@@ -30,6 +34,8 @@
 
   function activeHref(user) {
     if (pathname === '/jobs.html' || pathname.startsWith('/jobs/') || pathname === '/apply.html') return '/jobs.html';
+    if (pathname === '/matches.html') return '/matches.html';
+    if (pathname === '/ai-tools.html') return '/ai-tools.html';
     if (pathname === '/cv.html') return '/cv.html';
     if (pathname === '/applications.html') return '/applications.html';
     if (pathname === '/notifications.html') return '/notifications.html';

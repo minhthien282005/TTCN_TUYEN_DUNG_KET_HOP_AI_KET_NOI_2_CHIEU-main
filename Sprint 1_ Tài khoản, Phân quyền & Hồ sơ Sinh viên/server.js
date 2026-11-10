@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const sprint2Api = require('../Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/api');
 const sprint3Api = require('../Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding/api');
 const sprint4Api = require('../Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo/api');
+const sprint5Api = require('../Sprint 5_ Matching hai chiều, Giải thích & Hoàn thiện/api');
 
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
@@ -127,6 +128,8 @@ async function api(req, res, url) {
   if (sprint2Response !== null) return;
   const sprint4Response = await sprint4Api.handleRequest(req, res, url, user, { db, save, audit, sendMail, dataDir: DATA_DIR });
   if (sprint4Response !== null) return;
+  const sprint5Response = await sprint5Api.handleRequest(req, res, url, user, { db, save, audit });
+  if (sprint5Response !== null) return;
   const sprint3Response = await sprint3Api.handleRequest(req, res, url, user, { db, save, audit });
   if (sprint3Response !== null) return;
   if (req.method === 'GET' && url.pathname === '/api/me') return json(res, 200, { user: user ? publicUser(user) : null });
@@ -301,6 +304,7 @@ async function api(req, res, url) {
     user.deletedAt = new Date().toISOString(); user.email = `deleted-${user.id}@invalid.local`; user.name = 'Tài khoản đã xóa'; user.profile = {};
     await sprint3Api.deleteUserData(db, user);
     sprint4Api.deleteUserData(db, user);
+    sprint5Api.deleteUserData(db, user);
     db.sessions = db.sessions.filter(s => s.userId !== user.id); audit(user.id, 'account.delete'); save();
     return json(res, 200, { message: 'Tài khoản đã được xóa mềm.' }, { 'Set-Cookie': clearCookie() });
   }
@@ -339,7 +343,7 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=300' }); res.end(req.method === 'HEAD' ? undefined : sitemap); return;
     }
     if (url.pathname === '/robots.txt') {
-      const robots = `User-agent: *\nAllow: /\nDisallow: /employer.html\nDisallow: /moderation.html\nDisallow: /my-jobs.html\nDisallow: /cv.html\nDisallow: /applications.html\nDisallow: /apply.html\nDisallow: /ats.html\nDisallow: /notifications.html\nDisallow: /api/\nSitemap: ${APP_BASE_URL}/sitemap.xml\n`;
+      const robots = `User-agent: *\nAllow: /\nDisallow: /employer.html\nDisallow: /moderation.html\nDisallow: /my-jobs.html\nDisallow: /cv.html\nDisallow: /applications.html\nDisallow: /apply.html\nDisallow: /ats.html\nDisallow: /notifications.html\nDisallow: /matches.html\nDisallow: /ai-tools.html\nDisallow: /api/\nSitemap: ${APP_BASE_URL}/sitemap.xml\n`;
       res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=300' }); res.end(req.method === 'HEAD' ? undefined : robots); return;
     }
     const isSprintAsset = url.pathname === '/sprint1/app.js';
@@ -347,8 +351,10 @@ const server = http.createServer(async (req, res) => {
     const isSprint3Asset = url.pathname.startsWith('/sprint3/') || url.pathname === '/cv.html';
     const sprint4Pages = ['/apply.html', '/applications.html', '/ats.html', '/notifications.html'];
     const isSprint4Asset = url.pathname.startsWith('/sprint4/') || sprint4Pages.includes(url.pathname);
-    const assetRoot = isSprintAsset ? __dirname : isSprint2Asset ? path.resolve(__dirname, '..', 'Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt') : isSprint3Asset ? path.resolve(__dirname, '..', 'Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding') : isSprint4Asset ? path.resolve(__dirname, '..', 'Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo') : PUBLIC;
-    const requested = isSprintAsset ? 'app.js' : isSprint2Asset ? (url.pathname.startsWith('/sprint2/') ? decodeURIComponent(url.pathname.slice('/sprint2/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint3Asset ? (url.pathname.startsWith('/sprint3/') ? decodeURIComponent(url.pathname.slice('/sprint3/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint4Asset ? (url.pathname.startsWith('/sprint4/') ? decodeURIComponent(url.pathname.slice('/sprint4/'.length)) : decodeURIComponent(url.pathname.slice(1))) : url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
+    const sprint5Pages = ['/matches.html', '/ai-tools.html'];
+    const isSprint5Asset = url.pathname.startsWith('/sprint5/') || sprint5Pages.includes(url.pathname);
+    const assetRoot = isSprintAsset ? __dirname : isSprint2Asset ? path.resolve(__dirname, '..', 'Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt') : isSprint3Asset ? path.resolve(__dirname, '..', 'Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding') : isSprint4Asset ? path.resolve(__dirname, '..', 'Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo') : isSprint5Asset ? path.resolve(__dirname, '..', 'Sprint 5_ Matching hai chiều, Giải thích & Hoàn thiện') : PUBLIC;
+    const requested = isSprintAsset ? 'app.js' : isSprint2Asset ? (url.pathname.startsWith('/sprint2/') ? decodeURIComponent(url.pathname.slice('/sprint2/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint3Asset ? (url.pathname.startsWith('/sprint3/') ? decodeURIComponent(url.pathname.slice('/sprint3/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint4Asset ? (url.pathname.startsWith('/sprint4/') ? decodeURIComponent(url.pathname.slice('/sprint4/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint5Asset ? (url.pathname.startsWith('/sprint5/') ? decodeURIComponent(url.pathname.slice('/sprint5/'.length)) : decodeURIComponent(url.pathname.slice(1))) : url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
     const target = path.resolve(assetRoot, requested);
     if (!target.startsWith(`${assetRoot}${path.sep}`) && target !== path.join(PUBLIC, 'index.html')) return json(res, 403, { error: 'Forbidden.' });
     fs.readFile(target, (err, content) => {
@@ -370,4 +376,5 @@ expirePublishedJobs();
 setInterval(expirePublishedJobs, 60_000).unref();
 sprint3Api.startWorker({ db, save, audit });
 sprint4Api.startWorker({ db, save, sendMail });
+sprint5Api.startWorker({ db, save });
 server.listen(PORT, () => console.log(`Ứng dụng đang chạy tại http://localhost:${PORT}`));

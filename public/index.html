@@ -16,6 +16,10 @@
   <link rel="stylesheet" href="/site-nav.css">
   <script src="/sprint1/app.js?v=demo-accounts-15" defer></script>
   <script src="/site-nav.js" defer></script>
+  <link rel="stylesheet" href="/sprint5/assistant.css">
+  <link rel="stylesheet" href="/sprint5/homepage.css">
+  <script src="/sprint5/homepage.js" defer></script>
+  <script src="/sprint5/home-assistant.js" defer></script>
 </head>
 <body>
   <header class="topbar site-header">
@@ -29,7 +33,7 @@
       <div class="home-hero-inner">
         <div class="home-copy">
           <p class="home-kicker"><span></span> KẾT NỐI NGHỀ NGHIỆP HAI CHIỀU</p>
-          <h1>Công việc phù hợp.<br><em>Con đường của bạn.</em></h1>
+        <h1><span>Công việc phù hợp.</span><br><em>Con đường của bạn.</em></h1>
           <p class="home-lead">Tìm cơ hội theo kỹ năng, định hướng và cách bạn muốn làm việc. Nhà tuyển dụng tìm thấy ứng viên qua năng lực thật.</p>
           <div class="home-actions"><button class="home-primary" data-open="register">Tạo hồ sơ miễn phí <span>↗</span></button><a class="home-secondary" href="#how">Khám phá cách hoạt động <span>↓</span></a></div>
           <div class="home-values"><span><b>01</b> Kỹ năng trước chức danh</span><span><b>02</b> Minh bạch về độ phù hợp</span><span><b>03</b> Bạn kiểm soát hồ sơ</span></div>
@@ -48,7 +52,14 @@
       </div>
     </section>
 
+    <section class="s5-home-search" aria-labelledby="home-search-title">
+      <div class="s5-home-search-inner"><div class="s5-home-search-heading"><p class="home-kicker">BẮT ĐẦU TỪ ĐIỀU BẠN ĐANG TÌM</p><h2 id="home-search-title">Một cơ hội <em>phù hợp hơn.</em></h2></div>
+        <form class="s5-home-search-form" id="home-job-search"><label><span>Vị trí hoặc kỹ năng</span><input name="q" type="search" maxlength="120" placeholder="Ví dụ: Frontend, phân tích dữ liệu"></label><label><span>Địa điểm</span><input name="location" maxlength="100" placeholder="Hà Nội, TP.HCM hoặc từ xa"></label><button class="home-primary" type="submit"><span class="s5-search-icon" aria-hidden="true">⌕</span>Tìm việc</button></form>
+        <div class="s5-search-chips" aria-label="Tìm nhanh"><span>Tìm nhanh:</span><a href="/jobs.html?q=Th%E1%BB%B1c+t%E1%BA%ADp">Thực tập</a><a href="/jobs.html?q=Frontend">Frontend</a><a href="/jobs.html?q=Marketing">Marketing</a><a href="/jobs.html?q=Data+Analyst">Data Analyst</a><a href="/jobs.html?workMode=T%E1%BB%AB+xa">Làm việc từ xa</a></div>
+      </div>
+    </section>
     <section class="principles" aria-label="Nguyên tắc kết nối"><div><span>01</span><strong>Năng lực nổi bật hơn từ khóa</strong></div><div><span>02</span><strong>Lý do kết nối rõ ràng</strong></div><div><span>03</span><strong>Quyền riêng tư do bạn chọn</strong></div></section>
+    <section class="s5-home-jobs" aria-labelledby="home-jobs-title"><div class="s5-home-jobs-heading"><div><p class="home-kicker">CƠ HỘI MỚI TRÊN KETNOI</p><h2 id="home-jobs-title">Việc làm đáng <em>khám phá.</em></h2><p id="home-jobs-subtitle">Tin đang tuyển từ các doanh nghiệp đã xác minh.</p></div><a id="home-jobs-link" href="/jobs.html">Xem tất cả việc làm <span>↗</span></a></div><div class="s5-home-jobs-grid" id="home-jobs-list" aria-live="polite"><p class="s5-home-loading">Đang tìm cơ hội mới…</p></div></section>
 
     <section class="audience-section" id="candidates">
       <div class="section-intro"><p class="home-kicker">MỘT NỀN TẢNG, HAI PHÍA</p><h2>Kết nối bắt đầu<br>từ <em>hiểu đúng.</em></h2><p>Mỗi bên có một mục tiêu riêng. Ketnoi giúp cuộc gặp đầu tiên bắt đầu từ thông tin có ý nghĩa.</p></div>
@@ -62,6 +73,16 @@
 
     <section class="closing-cta"><div><p class="home-kicker">BƯỚC TIẾP THEO LÀ CỦA BẠN</p><h2>Sẵn sàng tìm điều<br><em>phù hợp hơn?</em></h2></div><button class="home-primary" data-open="register">Bắt đầu với Ketnoi <span>↗</span></button></section>
   </main>
+  <aside class="s5-chat" id="s5-chat" aria-label="Trợ lý AI Ketnoi">
+    <section class="s5-chat-panel" id="s5-chat-panel" aria-labelledby="s5-chat-title" hidden>
+      <header class="s5-chat-head"><span class="s5-chat-spark">✦</span><div><strong id="s5-chat-title">Trợ lý AI Ketnoi</strong><small>Gợi ý theo dữ liệu nghề nghiệp</small></div><button type="button" id="s5-chat-close" aria-label="Đóng trợ lý">×</button></header>
+      <div class="s5-chat-messages" id="s5-chat-messages" aria-live="polite"><div class="s5-chat-bubble assistant">Chào bạn! Mình có thể tìm việc theo kỹ năng, góp ý hồ sơ hoặc giúp nhà tuyển dụng khám phá ứng viên. Bạn muốn bắt đầu từ đâu?</div><div class="s5-chat-suggestions"><button type="button">Tìm việc phù hợp với tôi</button><button type="button">Cách cải thiện CV?</button></div></div>
+      <form class="s5-chat-form" id="s5-chat-form"><label class="s5-sr-only" for="s5-chat-input">Nhập câu hỏi cho trợ lý AI</label><input id="s5-chat-input" name="message" maxlength="1000" placeholder="Hỏi về việc làm, CV…" autocomplete="off" required><button type="submit" aria-label="Gửi câu hỏi">↑</button></form>
+      <label class="s5-ai-consent" id="s5-ai-consent-row" hidden><input type="checkbox" id="s5-ai-consent"><span>Cho phép gửi câu hỏi và ngữ cảnh nghề nghiệp tối thiểu tới dịch vụ AI bên ngoài để tạo câu trả lời. Bạn có thể tắt lại bất cứ lúc nào.</span></label>
+      <p class="s5-chat-disclaimer">Gợi ý tự động dựa trên dữ liệu Ketnoi; hãy kiểm tra thông tin trước khi quyết định.</p>
+    </section>
+    <button type="button" class="s5-chat-launcher" id="s5-chat-open" aria-expanded="false" aria-controls="s5-chat-panel"><span>✦</span><span>Hỏi AI</span></button>
+  </aside>
   <footer class="footer site-footer"><div class="footer-top"><a class="brand" href="/" aria-label="KETNOI — Trang chủ"><span class="brand-mark"><img src="/logo-mark.svg" alt=""></span><span class="brand-wordmark">KETNOI</span></a><p>Kết nối đúng người.<br>Mở ra đúng cơ hội.</p><div class="footer-links"><a href="#candidates">Sinh viên</a><a href="#employers">Nhà tuyển dụng</a><a href="#how">Cách hoạt động</a></div><button class="footer-login" data-open="login">Đăng nhập <span>↗</span></button></div><div class="footer-bottom"><span>© 2026 Ketnoi</span><span>Nền tảng kết nối nghề nghiệp hai chiều</span><span>Được thiết kế tại Việt Nam</span></div></footer>
 
   <div class="modal-backdrop" id="auth-modal" hidden><section class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button class="modal-close" id="modal-close" aria-label="Đóng">×</button><div class="modal-brand"><span class="brand-mark"><img src="/logo-mark.svg" alt=""></span></div><div id="modal-content"></div></section></div>
