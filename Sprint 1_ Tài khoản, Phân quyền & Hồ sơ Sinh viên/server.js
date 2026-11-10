@@ -343,7 +343,7 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=300' }); res.end(req.method === 'HEAD' ? undefined : robots); return;
     }
     const isSprintAsset = url.pathname === '/sprint1/app.js';
-    const isSprint2Asset = url.pathname.startsWith('/sprint2/') || ['/jobs.html', '/job.html', '/my-jobs.html', '/employer.html', '/moderation.html'].includes(url.pathname);
+    const isSprint2Asset = url.pathname.startsWith('/sprint2/') || ['/jobs.html', '/job.html', '/my-jobs.html', '/employer.html', '/employer-profile.html', '/moderation.html'].includes(url.pathname);
     const isSprint3Asset = url.pathname.startsWith('/sprint3/') || url.pathname === '/cv.html';
     const sprint4Pages = ['/apply.html', '/applications.html', '/ats.html', '/notifications.html'];
     const isSprint4Asset = url.pathname.startsWith('/sprint4/') || sprint4Pages.includes(url.pathname);

@@ -23,7 +23,8 @@ Các trang Sprint 2:
 
 - Tìm việc và lọc nâng cao: `/jobs.html`
 - Chi tiết tin: chọn **Xem chi tiết** trong kết quả tìm kiếm
-- Hồ sơ công ty và quản lý tin: `/employer.html`
+- Hồ sơ doanh nghiệp và xác minh: `/employer-profile.html`
+- Đăng tuyển và quản lý tin: `/employer.html`
 - Tin đã lưu và lịch sử xem: `/my-jobs.html` (sinh viên đã đăng nhập)
 - Bảng quản trị và kiểm duyệt: `/moderation.html` (admin)
 
@@ -56,7 +57,8 @@ Các trang Sprint 2:
 
 - `api.js`: API và quy tắc truy cập Sprint 2.
 - `jobs.html`, `jobs.js`, `job.html`, `job.js`: tìm kiếm và chi tiết công khai.
-- `employer.html`, `employer.js`: hồ sơ công ty và quản lý tin.
+- `employer-profile.html`, `employer-profile.js`: hồ sơ doanh nghiệp và xác minh.
+- `employer.html`, `employer.js`: đăng tuyển và quản lý tin.
 - `my-jobs.html`, `my-jobs.js`: tin đã lưu, lịch sử và quyền riêng tư.
 - `moderation.html`, `moderation.js`: quản trị và kiểm duyệt.
 - `docs/api.md`: hợp đồng API.

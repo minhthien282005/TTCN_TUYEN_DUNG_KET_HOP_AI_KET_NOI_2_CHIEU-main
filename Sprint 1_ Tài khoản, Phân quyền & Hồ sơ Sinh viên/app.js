@@ -35,7 +35,10 @@ function errorBox(message) { return `<div class="form-error" role="alert">${esca
 function setContent(html) { modalContent.innerHTML = html; openModal(); }
 
 function loginView(error = '') {
+  const studentDemoNames = ['Nguyễn Minh Anh', 'Trần Gia Bảo', 'Lê Thảo Nhi', 'Phạm Quốc Huy', 'Võ Khánh Linh', 'Đặng Hoàng Nam', 'Bùi Ngọc Mai', 'Ngô Đức Long', 'Phan Hà My', 'Đỗ Tuấn Kiệt', 'Vũ Yến Nhi', 'Đinh Minh Khang', 'Lý Thanh Trúc', 'Nguyễn Nhật Quang', 'Trương Bảo Châu'];
+  const employerDemoNames = ['Aurora Tech', 'GreenMetrics', 'Northstar Labs', 'Lumina Studio', 'Mekong AI', 'BlueOak Security', 'Chạm Media', 'Vina Embedded', 'Horizon Consulting', 'JavaWorks', 'Mây Creative', 'Delta Insight', 'Sông Việt Commerce', 'Sunbeam Mobile', 'Lotus Data Lab'];
   setContent(`<h2 id="modal-title">Chào mừng bạn trở lại</h2><p class="modal-intro">Đăng nhập để tiếp tục hành trình tìm kiếm cơ hội phù hợp.</p>
+    <label class="demo-login-picker"><span>Tài khoản mẫu · điền nhanh</span><select id="demo-account"><option value="">Chọn tài khoản mẫu</option><optgroup label="Sinh viên">${studentDemoNames.map((name, i) => `<option value="student${String(i + 1).padStart(2, '0')}@example.test">${name}</option>`).join('')}</optgroup><optgroup label="Nhà tuyển dụng">${employerDemoNames.map((name, i) => `<option value="employer${String(i + 1).padStart(2, '0')}@example.test">${name}</option>`).join('')}</optgroup><optgroup label="Quản trị viên"><option value="admin01@example.test">Quản trị viên Ketnoi</option></optgroup></select><small>Tài khoản mẫu dùng chung mật khẩu: KetnoiDemo2026!</small></label>
     <form id="login-form"><label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" placeholder="ban@email.com" required maxlength="254"></label>
     <label class="field"><span>Mật khẩu</span><input type="password" name="password" autocomplete="current-password" placeholder="Nhập mật khẩu" required maxlength="128"></label><p class="modal-switch forgot-back"><button type="button" data-view="forgot">Quên mật khẩu?</button></p>
     ${error ? errorBox(error) : ''}<button class="btn btn-primary btn-large modal-submit">Đăng nhập <span>↗</span></button></form>
@@ -64,7 +67,7 @@ function verificationResendForm(email) {
 
 function openDashboard(user) {
   if (!user || user.role !== 'student') {
-    setContent(`<div class="dashboard-head"><div><h2 id="modal-title">Tài khoản của bạn</h2><span class="dashboard-role">${user?.role === 'employer' ? 'Nhà tuyển dụng' : 'Tài khoản'}</span></div><button class="auth-tab" id="logout-button">Đăng xuất</button></div><div class="form-success">${user?.role === 'employer' ? 'Tài khoản nhà tuyển dụng đã sẵn sàng.' : 'Tài khoản đã sẵn sàng.'}</div>${user?.role === 'employer' ? '<a class="auth-tab" href="/employer.html">Quản lý doanh nghiệp và tin tuyển dụng ↗</a>' : ''}<label class="field"><span>Email đã xác minh</span><input value="${escapeHtml(user?.email || '')}" disabled></label><form id="change-email-form"><label class="field"><span>Email mới</span><input type="email" name="email" required maxlength="254" placeholder="email-moi@example.com"></label><label class="field"><span>Xác nhận bằng mật khẩu</span><input type="password" name="password" required autocomplete="current-password"></label><div id="email-change-result"></div><button class="auth-tab">Đổi email</button></form><form id="change-password-form"><label class="field"><span>Mật khẩu hiện tại</span><input type="password" name="currentPassword" required autocomplete="current-password"></label><label class="field"><span>Mật khẩu mới</span><input type="password" name="password" required minlength="8" maxlength="128" autocomplete="new-password"></label><div id="password-change-result"></div><button class="auth-tab">Đổi mật khẩu</button></form><button class="auth-tab danger-button" id="delete-account-button" type="button">Xóa tài khoản</button>`);
+    setContent(`<div class="dashboard-head"><div><h2 id="modal-title">Tài khoản của bạn</h2><span class="dashboard-role">${user?.role === 'employer' ? 'Nhà tuyển dụng' : 'Tài khoản'}</span></div><button class="auth-tab" id="logout-button">Đăng xuất</button></div><div class="form-success">${user?.role === 'employer' ? 'Tài khoản nhà tuyển dụng đã sẵn sàng.' : 'Tài khoản đã sẵn sàng.'}</div>${user?.role === 'employer' ? '<a class="auth-tab" href="/employer.html#job-form">Đăng tin tuyển dụng ↗</a><a class="auth-tab" href="/employer-profile.html">Hồ sơ doanh nghiệp</a>' : ''}<label class="field"><span>Email đã xác minh</span><input value="${escapeHtml(user?.email || '')}" disabled></label><form id="change-email-form"><label class="field"><span>Email mới</span><input type="email" name="email" required maxlength="254" placeholder="email-moi@example.com"></label><label class="field"><span>Xác nhận bằng mật khẩu</span><input type="password" name="password" required autocomplete="current-password"></label><div id="email-change-result"></div><button class="auth-tab">Đổi email</button></form><form id="change-password-form"><label class="field"><span>Mật khẩu hiện tại</span><input type="password" name="currentPassword" required autocomplete="current-password"></label><label class="field"><span>Mật khẩu mới</span><input type="password" name="password" required minlength="8" maxlength="128" autocomplete="new-password"></label><div id="password-change-result"></div><button class="auth-tab">Đổi mật khẩu</button></form><button class="auth-tab danger-button" id="delete-account-button" type="button">Xóa tài khoản</button>`);
     return;
   }
   profileView(user.profile || {});
@@ -115,7 +118,22 @@ function profileView(profile = {}, message = '') {
 
 document.addEventListener('click', async event => {
   const open = event.target.closest('[data-open]');
-  if (open) { if (open.dataset.open === 'register' || open.dataset.open === 'employer') registerView('', '', open.dataset.open === 'employer' ? 'employer' : 'student'); else loginView(); return; }
+  if (open) {
+    if (open.dataset.open === 'student' || open.dataset.open === 'employer') {
+      const role = open.dataset.open;
+      if (currentUser) {
+        if (currentUser.role !== role) {
+          const roleName = { student: 'sinh viên', employer: 'nhà tuyển dụng', admin: 'quản trị viên' }[currentUser.role] || 'người dùng';
+          showToast(`Bạn đang đăng nhập bằng tài khoản ${roleName}.`);
+          return;
+        }
+        openDashboard(currentUser);
+      } else registerView('', '', role);
+      return;
+    }
+    if (open.dataset.open === 'register') registerView(); else loginView();
+    return;
+  }
   const view = event.target.closest('[data-view]');
   if (view) { if (view.dataset.view === 'register') registerView(); else if (view.dataset.view === 'forgot') forgotView(); else loginView(); return; }
   if (event.target.closest('#modal-close') || event.target === modal) { closeModal(); return; }
@@ -149,6 +167,14 @@ document.addEventListener('click', async event => {
     const form = document.querySelector('#onboarding-form');
     onboardingView(currentUser.profile || {}, Number(form.dataset.step) - 1);
   }
+});
+document.addEventListener('change', event => {
+  if (event.target.id !== 'demo-account' || !event.target.value) return;
+  const form = document.querySelector('#login-form');
+  if (!form) return;
+  form.elements.email.value = event.target.value;
+  form.elements.password.value = 'KetnoiDemo2026!';
+  form.elements.email.focus();
 });
 document.addEventListener('keydown', event => {
   if (modal.hidden) return;
@@ -244,10 +270,12 @@ function updateNav() {
   const actions = document.querySelector('#nav-actions');
   if (!currentUser) {
     actions.innerHTML = '<button class="btn btn-quiet" data-open="login">Đăng nhập</button><button class="btn btn-primary btn-small" data-open="register">Tạo tài khoản <span aria-hidden="true">↗</span></button>';
+    window.ketnoiUpdateSiteNav?.(null);
     return;
   }
   actions.innerHTML = `<button class="btn btn-quiet" id="account-button">${escapeHtml(currentUser.profile?.fullName || currentUser.email)}</button><button class="btn btn-primary btn-small" id="logout-button">Đăng xuất</button>`;
   actions.querySelector('#account-button').addEventListener('click', () => openDashboard(currentUser));
+  window.ketnoiUpdateSiteNav?.(currentUser);
 }
 
 async function init() {
@@ -262,11 +290,19 @@ async function init() {
   if (resetToken) { history.replaceState({}, '', '/'); resetView(resetToken); }
   const params = new URLSearchParams(location.search);
   const nextPath = params.get('next') || '';
-  if (nextPath.startsWith('/') && !nextPath.startsWith('//')) authReturnPath = nextPath;
+  if (nextPath) {
+    try {
+      const returnUrl = new URL(nextPath, location.origin);
+      if (returnUrl.origin === location.origin) authReturnPath = `${returnUrl.pathname}${returnUrl.search}${returnUrl.hash}`;
+    } catch { authReturnPath = ''; }
+  }
   const openView = params.get('open');
   if (openView === 'login' || openView === 'register') {
     history.replaceState({}, '', '/');
     if (openView === 'register') registerView(); else loginView();
+  } else if (openView === 'account') {
+    history.replaceState({}, '', '/');
+    if (currentUser) openDashboard(currentUser); else loginView();
   }
 }
 init();

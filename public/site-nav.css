@@ -1,4 +1,16 @@
 /* Shared navigation used by the homepage and every sprint page. */
+body{margin:0;font-family:var(--sans,Arial,sans-serif)}
+.site-header{display:flex;align-items:center;justify-content:space-between}
+.site-header .brand{display:flex;align-items:center;gap:11px;flex:none;text-decoration:none;font:800 22px/1 var(--display,Arial,sans-serif)}
+.site-header .brand-mark{flex:none}
+.site-header .brand-wordmark{font:800 15px/1 var(--sans,Arial,sans-serif);letter-spacing:1.7px}
+.site-header .site-nav{display:flex;align-items:center;flex:1;justify-content:center;margin:0 auto;min-width:0}
+.site-header .site-actions{display:flex;align-items:center;gap:17px;flex:none}
+.site-header .site-actions a{font-family:var(--sans,Arial,sans-serif);text-decoration:none;white-space:nowrap}
+.site-header .site-actions .btn-quiet{padding:12px 16px;background:transparent;color:#364b41;font-size:13px;font-weight:650}
+.site-header .site-actions .btn-primary{padding:12px 16px;border:0;border-radius:6px;background:var(--home-green,#173e33);color:#fff;font-size:12px;font-weight:700}
+.site-header .site-actions .btn-primary span{margin-left:16px;color:var(--home-lime,#d8ed9b)}
+.site-header .mobile-menu{display:none;flex:none;align-items:center;justify-content:center;background:transparent;font-size:20px}
 .site-header .site-nav a[aria-current="page"]{color:var(--home-green);font-weight:700}
 .site-header .site-nav a[aria-current="page"]::after{transform:scaleX(1)}
 .site-header .site-actions a{display:inline-flex;align-items:center;justify-content:center}

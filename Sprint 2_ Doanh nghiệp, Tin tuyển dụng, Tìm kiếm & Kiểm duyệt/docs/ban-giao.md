@@ -30,7 +30,7 @@ npm.cmd start
 Truy cập `http://localhost:3000`. Nếu server đã chạy từ trước, nhấn `Ctrl+C` trong terminal của server rồi chạy lại lệnh trên để nạp phiên bản code mới. Các trang demo:
 
 1. Trang chủ → **Tìm việc** → lọc và mở chi tiết tin.
-2. Đăng nhập nhà tuyển dụng → `/employer.html` → lưu hồ sơ công ty, nộp giấy tờ, tạo nháp/gửi duyệt và theo dõi trạng thái.
+2. Đăng nhập nhà tuyển dụng → `/employer-profile.html` để cập nhật hồ sơ công ty và gửi giấy tờ xác minh; `/employer.html` để tạo tin, gửi duyệt và theo dõi trạng thái.
 3. Đăng nhập admin → `/moderation.html` → xác minh công ty, duyệt/yêu cầu chỉnh sửa/từ chối tin.
 4. Đăng nhập sinh viên → `/my-jobs.html` → lưu tin, xem lịch sử và chỉnh quyền riêng tư.
 5. Quay lại trang tìm việc để xác nhận tin đã duyệt và còn hạn xuất hiện.
