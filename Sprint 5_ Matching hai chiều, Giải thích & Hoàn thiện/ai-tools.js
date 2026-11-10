@@ -47,3 +47,4 @@
   });
   init().catch(error => { notice.textContent = error.message; showToolStatus(true); });
 })();
+// Note: Sprint 5 update date 10/11/2026.

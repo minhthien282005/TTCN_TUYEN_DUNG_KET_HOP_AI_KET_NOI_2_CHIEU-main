@@ -23,3 +23,4 @@ Reports whether matching and optional generative assistance are configured and w
 ## `POST /api/sprint5/consent`
 
 Account session required. Body: `{ "granted": true|false }`. Records the latest user choice for external AI processing; account deletion removes these consent records.
+<!-- Note: Sprint 5 update date 10/11/2026. -->

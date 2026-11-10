@@ -35,3 +35,4 @@ Trợ lý nhận câu hỏi tiếng Việt, tìm việc, đọc gợi ý của t
 - `migrations/005_sprint5.up.sql`, `migrations/005_sprint5.down.sql`: schema đích PostgreSQL (runtime JSON chưa áp dụng migration).
 - `docs/ban-giao.md`: biên bản bàn giao và trạng thái.
 - `docs/api.md`: routes Sprint 5 và hợp đồng request/response.
+<!-- Note: Sprint 5 update date 10/11/2026. -->

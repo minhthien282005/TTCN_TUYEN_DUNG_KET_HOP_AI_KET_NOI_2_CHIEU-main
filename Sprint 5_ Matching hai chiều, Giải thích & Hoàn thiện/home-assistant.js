@@ -53,3 +53,4 @@
   });
   window.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) toggle(false); });
 })();
+// Note: Sprint 5 update date 10/11/2026.

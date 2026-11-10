@@ -38,3 +38,4 @@
   }
   load().catch(() => { list.innerHTML = '<div class="s5-home-no-jobs"><strong>Chưa tải được danh sách việc.</strong><p>Bạn có thể vào trang tìm việc để xem các tin đang công khai.</p><a href="/jobs.html">Tìm việc ↗</a></div>'; });
 })();
+// Note: Sprint 5 update date 10/11/2026.

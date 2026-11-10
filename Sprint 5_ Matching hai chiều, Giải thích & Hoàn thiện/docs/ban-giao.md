@@ -22,3 +22,4 @@
 - Resend (`RESEND_API_KEY`, `MAIL_FROM`) cho email notification; in-app không phụ thuộc dịch vụ này.
 - OpenAI (`OPENAI_API_KEY`) là tùy chọn, mặc định trợ lý không gửi dữ liệu ra ngoài.
 - Dùng PostgreSQL/queue ngoài tiến trình và kiểm định mô hình trước khi dùng sản xuất.
+<!-- Note: Sprint 5 update date 10/11/2026. -->

@@ -1,0 +1,121 @@
+/* Ketnoi application palette: shared accents for the working screens. */
+:root{--app-teal:#238b77;--app-teal-deep:#176553;--app-violet:#8059b5;--app-violet-soft:#f2eaff;--app-coral:#e98f68;--app-coral-soft:#fff0e7;--app-mint:#e5f5ee;--app-blue-soft:#eaf2ff}
+
+/* Job search, publishing and moderation */
+.s2-header{background:linear-gradient(100deg,#f4f1ff,#f3fbf8 56%,#fff7f0);border-color:#e8e0f1}
+.s2-heading h1 em{color:var(--app-violet)}
+.s2-eyebrow,.s2-step{color:#7656a4}
+.s2-step{border-color:#e3d9f2;background:#f7f2ff}
+.s2-panel{border-color:#e7e0ef;box-shadow:0 12px 35px rgba(83,62,119,.08)}
+.s2-panel:nth-of-type(odd){border-top:3px solid #63b894}
+.s2-panel:nth-of-type(even){border-top:3px solid #a184d2}
+.s2-job-row,.s2-public-card{border-color:#e8e1ef;box-shadow:0 8px 22px rgba(83,62,119,.045)}
+.s2-job-row:nth-child(3n+1),.s2-public-card:nth-child(3n+1){border-left:3px solid #60b38f}
+.s2-job-row:nth-child(3n+2),.s2-public-card:nth-child(3n+2){border-left:3px solid #a184d2}
+.s2-job-row:nth-child(3n),.s2-public-card:nth-child(3n){border-left:3px solid #ed9a70}
+.s2-button{background:linear-gradient(110deg,var(--app-teal-deep),var(--app-teal));box-shadow:0 5px 14px rgba(35,139,119,.14)}
+.s2-button:hover{background:linear-gradient(110deg,#155b50,#287f91)}
+.s2-secondary{background:var(--app-violet-soft);border:1px solid #e1d5f1;color:#704ca4;box-shadow:none}
+.s2-secondary:hover{background:#eadefb}
+.s2-status{background:var(--app-mint);color:#287355}
+.s2-status.pending_review{background:#fff2d9;color:#966019}
+.s2-status.rejected{background:#ffebe8;color:#a4473b}
+.s2-salary{color:#25836b}
+.s2-search{background:linear-gradient(110deg,#f0fbf8,#f5f0ff 65%,#fff7f0);border-color:#e5dcef}
+.s2-tabs [aria-selected="true"],.s2-pagination button[aria-current=page]{background:var(--app-violet);border-color:var(--app-violet);color:#fff}
+.s2-grid input:focus,.s2-grid select:focus,.s2-grid textarea:focus,.s2-search input:focus,.s2-search select:focus{outline:2px solid #b293dc;outline-offset:1px;border-color:#9672c6}
+
+/* CV and profile tools */
+.cv-page{background:radial-gradient(ellipse at 90% 5%,rgba(222,207,255,.36),transparent 32%),linear-gradient(145deg,#f7f4ff,#f5fbf7 57%,#fff8f2);}
+.s3-header{background:rgba(255,255,255,.88);border-color:#e5def0}
+.s3-mark{background:#efe6fb;color:#7250a6}
+.s3-eyebrow,.s3-hero h1 em{color:var(--app-violet)}
+.s3-panel{border-color:#e5deef;box-shadow:0 12px 35px rgba(83,62,119,.075)}
+.s3-panel:nth-of-type(odd){border-top:3px solid #68b795}
+.s3-panel:nth-of-type(even){border-top:3px solid #a184d2}
+.s3-button{background:linear-gradient(110deg,var(--app-teal-deep),var(--app-teal));box-shadow:0 5px 14px rgba(35,139,119,.14)}
+.s3-button:hover{background:linear-gradient(110deg,#155b50,#287f91)}
+.s3-secondary{background:var(--app-violet-soft);color:#704ca4}
+.s3-status{background:var(--app-blue-soft);color:#5d4b94}
+.s3-status.review{background:var(--app-mint);color:#287355}
+.s3-embedding{background:linear-gradient(110deg,#e5f5ee,#efe7fb 65%,#fff0e7)}
+.s3-vector-icon{color:var(--app-violet)}
+.s3-field.low-confidence{border-color:#f0c28f;background:#fff8ee}
+
+/* Applications, notifications and recruiter ATS */
+.s4-page{background:radial-gradient(ellipse at 95% 0,rgba(224,209,255,.34),transparent 31%),linear-gradient(135deg,#f5f3ff,#f5fbf8 60%,#fff8f1)!important}
+.s4-header{background:rgba(255,255,255,.9);border-color:#e7e0f0}
+.s4-brand{color:#57427d}
+.s4-header nav a.active,.s4-header nav a:hover{color:var(--app-violet)}
+.s4-header nav a span{background:var(--app-coral)}
+.s4-eyebrow{color:#7656a4}
+.s4-heading h1{color:#203a31}
+.s4-panel{border-color:#e6dfef;box-shadow:0 9px 28px rgba(83,62,119,.07)}
+.s4-panel:nth-of-type(odd){border-top:3px solid #67b795}
+.s4-panel:nth-of-type(even){border-top:3px solid #9d7bcf}
+.s4-button{background:linear-gradient(110deg,var(--app-teal-deep),var(--app-teal));box-shadow:0 5px 13px rgba(35,139,119,.13)}
+.s4-button:hover{background:linear-gradient(110deg,#155b50,#287f91)}
+.s4-button.secondary{background:var(--app-violet-soft);border-color:#e3d8f2;color:#704ca4;box-shadow:none}
+.s4-tag{background:var(--app-mint);color:#287355}
+.s4-timeline span.done{border-color:#58aa84;color:#287355}
+.s4-timeline span.current{border-color:#a184d2;color:#704ca4}
+.s4-lane:nth-child(3n+1){background:#eff9f4}
+.s4-lane:nth-child(3n+2){background:#f5f0fc}
+.s4-lane:nth-child(3n){background:#fff5ed}
+.s4-app-card{border-color:#e5deef;box-shadow:0 4px 13px rgba(83,62,119,.045)}
+.s4-app-card:hover{border-color:#bca8df}
+.s4-question{border-color:#e5deef;background:rgba(255,255,255,.8)}
+.s4-notice:not(.error){background:var(--app-mint);color:#287355}
+
+/* Matching, AI writing tools and home assistant */
+.s5-shell{background:transparent}
+.s5-intro h1 em{color:var(--app-violet)}
+.s5-toolbar{border-color:#e5dcef}
+.s5-toolbar h2{color:#263c32}
+.s5-card{border-color:#e6deef;box-shadow:0 8px 25px rgba(83,62,119,.07)}
+.s5-card:nth-child(3n+1){border-top:3px solid #63b894}
+.s5-card:nth-child(3n+2){border-top:3px solid #9d7bcf}
+.s5-card:nth-child(3n){border-top:3px solid #ed9a70}
+.s5-company-icon{background:#eee6fa;color:#704ca4}
+.s5-card:nth-child(3n+2) .s5-company-icon{background:#e2f4eb;color:#287355}
+.s5-card:nth-child(3n) .s5-company-icon{background:#fff0e7;color:#ad603e}
+.s5-tags span{background:#f1ecfa;color:#66518b}
+.s5-tags span:nth-child(3n+2){background:#e7f5ee;color:#287355}
+.s5-tags span:nth-child(3n){background:#fff0e7;color:#a85b3c}
+.s5-tags span.matched{background:#e3f4e9;color:#287355}
+.s5-score strong{color:var(--app-violet)}
+.s5-meter i{background:linear-gradient(90deg,#55b28c,#a184d2)}
+.s5-button{background:linear-gradient(110deg,var(--app-teal-deep),var(--app-teal));box-shadow:0 5px 13px rgba(35,139,119,.13)}
+.s5-button:hover{background:linear-gradient(110deg,#155b50,#287f91)}
+.s5-method{background:linear-gradient(110deg,#eaf7f1,#f3edfc)}
+.s5-method>span{color:var(--app-violet)}
+.s5-empty{background:linear-gradient(120deg,#f4fbf8,#f7f2fd,#fff8f2);border-color:#ded3ee}
+.s5-tool-card{border-color:#e5deef;box-shadow:0 9px 30px rgba(83,62,119,.07)}
+.s5-tool-card:nth-child(odd){border-top:3px solid #63b894}
+.s5-tool-card:nth-child(even){border-top:3px solid #9d7bcf}
+.s5-tool-heading>span{color:var(--app-violet)}
+.s5-tool-heading h2{color:#324b3d}
+.s5-tool-result{background:linear-gradient(110deg,#eff8f4,#f4effb);border-color:#e3d9ef}
+.s5-secondary-button{background:var(--app-violet-soft);border-color:#dfd1f0;color:#704ca4}
+.s5-chat-launcher,.s5-chat-form button{background:linear-gradient(110deg,var(--app-teal-deep),var(--app-teal))}
+.s5-chat-head{background:linear-gradient(110deg,#176553,#58417d)}
+.s5-chat-spark{background:rgba(255,255,255,.14);color:#fff0a8}
+.s5-chat-bubble:not(.user):not(.error){background:#f0eafb;color:#51446b}
+.s5-chat-bubble.user{background:#238b77}
+.s5-chat-suggestions button{border-color:#e2d7f0;color:#704ca4}
+
+/* Shared accessible focus color, without changing success/error semantics. */
+:is(.s2-shell,.s3-shell,.s4-shell,.s5-shell) :is(input,select,textarea,button,a):focus-visible{outline:3px solid #b392da;outline-offset:2px}
+.auth-modal{border:1px solid #e4d9f1;border-top:4px solid var(--app-violet);box-shadow:0 24px 80px rgba(52,41,76,.25)}
+.auth-tab{border-color:#e4daef;background:#fff;color:#685282}
+.auth-tab:hover{background:#f7f2ff;border-color:#cbb8e7}
+.auth-tab.active{background:var(--app-violet-soft);border-color:#cfbce9;color:#654493}
+.auth-modal .field input:focus,.auth-modal .field select:focus,.auth-modal .field textarea:focus{border-color:#9b7bc8;box-shadow:0 0 0 3px #eee6fa}
+.auth-modal .check-row input{accent-color:var(--app-violet)}
+.auth-modal .modal-switch button{color:var(--app-violet)}
+.profile-completion{background:linear-gradient(110deg,#e8f6ef,#f2ebfb);border:1px solid #e2d9ee}
+.completion-track{background:#e8e1f0}
+.completion-track i{background:linear-gradient(90deg,#50b18a,#a17dce)}
+.tag-option.selected{background:var(--app-violet-soft);border-color:#d0bee8;color:#674796}
+.toast{background:linear-gradient(110deg,#176553,#58417d)}
+@media(max-width:650px){.s2-header,.s3-header,.s4-header{background:#f7f4ff}.s2-panel,.s3-panel,.s4-panel{box-shadow:0 7px 20px rgba(83,62,119,.06)}}

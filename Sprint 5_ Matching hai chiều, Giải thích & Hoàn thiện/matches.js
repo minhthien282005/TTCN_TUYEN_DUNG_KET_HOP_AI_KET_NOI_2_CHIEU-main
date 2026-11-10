@@ -25,3 +25,4 @@
     $('#s5-list').innerHTML = error.status === 401 ? '<article class="s5-empty"><span>✦</span><h3>Gợi ý hai chiều, cá nhân hóa</h3><p>Sinh viên xem công việc khớp với CV. Nhà tuyển dụng tìm hồ sơ công khai phù hợp với tin đang tuyển.</p><a href="/?open=login&amp;next=%2Fmatches.html" class="s5-button">Đăng nhập để tiếp tục</a></article>' : '';
   });
 })();
+// Note: Sprint 5 update date 10/11/2026.

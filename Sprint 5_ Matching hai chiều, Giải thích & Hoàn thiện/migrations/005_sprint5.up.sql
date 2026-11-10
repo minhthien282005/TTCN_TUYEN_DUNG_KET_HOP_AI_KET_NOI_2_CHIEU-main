@@ -10,3 +10,4 @@ CREATE TABLE IF NOT EXISTS match_notifications (
 
 CREATE INDEX IF NOT EXISTS idx_jobs_published_expiry ON jobs (status, expires_at) WHERE status = 'published';
 COMMIT;
+-- Note: Sprint 5 update date 10/11/2026.

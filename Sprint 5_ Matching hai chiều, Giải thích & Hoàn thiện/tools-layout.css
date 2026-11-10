@@ -1,1 +1,2 @@
 .s5-tools-grid:has(#s5-employer-tool:not([hidden])),.s5-tools-grid:has(#s5-student-tool:not([hidden])){grid-template-columns:minmax(0,820px);justify-content:center}
+/* Note: Sprint 5 update date 10/11/2026. */
