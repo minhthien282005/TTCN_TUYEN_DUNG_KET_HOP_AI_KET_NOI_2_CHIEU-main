@@ -1,20 +1,87 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f8f8f5">
-  <title>Đăng tuyển — Ketnoi</title><link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="/home.css"><link rel="stylesheet" href="/sprint2/sprint2.css">
-  <script src="/sprint2/employer.js" defer></script><link rel="stylesheet" href="/site-nav.css"><script src="/site-nav.js" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f8f5">
+  <title>Đăng tuyển — Ketnoi</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/home.css">
+  <link rel="stylesheet" href="/sprint2/sprint2.css">
+  <script src="/sprint2/employer.js" defer></script>
+  <link rel="stylesheet" href="/site-nav.css">
+  <script src="/site-nav.js" defer></script>
 </head>
 <body>
-  <header class="topbar site-header"><a class="brand" href="/"><span class="brand-mark"><img src="/logo-mark.svg" alt=""></span><span class="brand-wordmark">KETNOI</span></a><nav class="desktop-nav site-nav" id="primary-nav" aria-label="Điều hướng chính"></nav><div class="nav-actions site-actions" id="nav-actions"></div><button class="mobile-menu" id="mobile-menu" aria-label="Mở menu" aria-expanded="false" aria-controls="primary-nav">☰</button></header>
+  <header class="topbar site-header">
+    <a class="brand" href="/"><span class="brand-mark"><img src="/logo-mark.svg" alt=""></span><span class="brand-wordmark">KETNOI</span></a>
+    <nav class="desktop-nav site-nav" id="primary-nav" aria-label="Điều hướng chính"></nav>
+    <div class="nav-actions site-actions" id="nav-actions"></div>
+    <button class="mobile-menu" id="mobile-menu" aria-label="Mở menu" aria-expanded="false" aria-controls="primary-nav">☰</button>
+  </header>
   <main class="s2-shell">
-    <div class="s2-heading"><p class="s2-eyebrow">KHÔNG GIAN TUYỂN DỤNG</p><h1>Đăng tuyển.<br><em>Theo dõi ứng viên.</em></h1><p>Tạo tin tuyển dụng và quản lý trạng thái tin ở một nơi. Thông tin công ty và xác minh được cập nhật riêng trong hồ sơ doanh nghiệp.</p><a class="s2-button s2-post-entry" href="/employer-profile.html">Hồ sơ doanh nghiệp ↗</a></div>
-    <div id="notice" role="status" aria-live="polite"></div><div id="company-status"></div>
-    <section class="s2-panel" id="post-job"><div class="s2-panel-title"><div><span class="s2-step">01</span><h2>Tạo tin tuyển dụng</h2></div><p>Tin gửi đi sẽ chờ kiểm duyệt. Doanh nghiệp cần được xác minh và tin được duyệt trước khi hiển thị công khai.</p></div>
-      <form id="job-form" class="s2-grid"><label>Chức danh *<input name="title" required minlength="4" maxlength="120" placeholder="Frontend Developer"></label><label>Lĩnh vực<input name="industry" maxlength="120"></label><label>Địa điểm<input name="location" maxlength="100" placeholder="TP. Hồ Chí Minh"></label><label>Loại công việc<select name="type" required><option value="">Chọn loại</option><option>Thực tập</option><option>Toàn thời gian</option><option>Bán thời gian</option><option>Freelance</option><option>Hợp đồng</option></select></label><label>Hình thức<select name="workMode"><option>Tại văn phòng</option><option>Kết hợp</option><option>Từ xa</option></select></label><label>Lương tối thiểu (VNĐ/tháng)<input name="salaryMin" type="number" min="0" step="500000"></label><label>Lương tối đa (VNĐ/tháng)<input name="salaryMax" type="number" min="0" step="500000"></label><label class="s2-wide">Mô tả công việc *<textarea name="description" required minlength="30" rows="6" maxlength="10000" placeholder="Ít nhất 30 ký tự"></textarea></label><div class="s2-wide s2-actions"><button class="s2-button" name="publish" value="true">Đăng tuyển · gửi kiểm duyệt</button><button class="s2-button s2-secondary" name="draft" value="true">Lưu bản nháp</button></div></form>
-      <form id="job-extra-form" class="s2-grid"><label>Cấp bậc<input name="level" placeholder="Junior, Intern"></label><label>Kinh nghiệm<input name="experience" placeholder="Không yêu cầu"></label><label>Số lượng tuyển<input name="headcount" type="number" min="1" max="1000" value="1"></label><label>Đối tượng<input name="target" placeholder="Sinh viên năm 3–4"></label><label>Hạn đăng *<input name="expiresAt" type="date" required></label><label class="s2-wide">Kỹ năng (mỗi dòng: tên | required/preferred | trọng số 1–100)<textarea name="skillCriteria" rows="4" placeholder="JavaScript | required | 30&#10;React | preferred | 15"></textarea></label><label class="s2-wide">Yêu cầu<textarea name="requirements" rows="3" maxlength="6000"></textarea></label><label class="s2-wide">Quyền lợi<textarea name="benefits" rows="3" maxlength="4000"></textarea></label><label class="s2-wide">Quy trình tuyển dụng<textarea name="recruitmentProcess" rows="2" maxlength="2000"></textarea></label><label>Trọng số kỹ năng %<input name="weightSkills" type="number" min="0" max="100" value="60"></label><label>Trọng số học vấn %<input name="weightEducation" type="number" min="0" max="100" value="15"></label><label>Trọng số kinh nghiệm %<input name="weightExperience" type="number" min="0" max="100" value="15"></label><label>Trọng số ngoại ngữ %<input name="weightLanguages" type="number" min="0" max="100" value="5"></label><label>Trọng số dự án %<input name="weightProjects" type="number" min="0" max="100" value="5"></label></form>
+    <div class="s2-heading">
+      <p class="s2-eyebrow">KHÔNG GIAN TUYỂN DỤNG</p>
+      <h1>Đăng tuyển.<br><em>Theo dõi ứng viên.</em></h1>
+      <p>Tạo tin tuyển dụng và quản lý trạng thái tin ở một nơi. Thông tin công ty và xác minh được cập nhật riêng trong hồ sơ doanh nghiệp.</p>
+      <a class="s2-button s2-post-entry" href="/employer-profile.html">Hồ sơ doanh nghiệp ↗</a>
+    </div>
+    <div id="notice" role="status" aria-live="polite"></div>
+    <div id="company-status"></div>
+    <section class="s2-panel" id="post-job">
+      <div class="s2-panel-title">
+        <div><span class="s2-step">01</span><h2>Tạo tin tuyển dụng</h2></div>
+        <p>Tin gửi đi sẽ chờ kiểm duyệt. Doanh nghiệp cần được xác minh và tin được duyệt trước khi hiển thị công khai.</p>
+      </div>
+      <form id="job-form" class="s2-job-form">
+        <fieldset class="s2-job-fieldset">
+          <legend>Thông tin công việc</legend>
+          <div class="s2-job-fields">
+            <label>Chức danh *<input name="title" required minlength="4" maxlength="120" placeholder="Frontend Developer"></label>
+            <label>Lĩnh vực<input name="industry" maxlength="120" placeholder="Công nghệ thông tin"></label>
+            <label>Địa điểm<input name="location" maxlength="100" placeholder="TP. Hồ Chí Minh"></label>
+            <label>Loại công việc<select name="type" required><option value="">Chọn loại</option><option>Thực tập</option><option>Toàn thời gian</option><option>Bán thời gian</option><option>Freelance</option><option>Hợp đồng</option></select></label>
+            <label>Hình thức<select name="workMode"><option>Tại văn phòng</option><option>Kết hợp</option><option>Từ xa</option></select></label>
+            <label>Số lượng tuyển<input name="headcount" type="number" min="1" max="1000" value="1"></label>
+            <label>Lương tối thiểu (VNĐ/tháng)<input name="salaryMin" type="number" min="0" step="500000"></label>
+            <label>Lương tối đa (VNĐ/tháng)<input name="salaryMax" type="number" min="0" step="500000"></label>
+            <label class="s2-job-field-wide">Mô tả công việc *<textarea name="description" required minlength="30" rows="6" maxlength="10000" placeholder="Mô tả trách nhiệm, đội ngũ và kết quả mong đợi (ít nhất 30 ký tự)"></textarea></label>
+          </div>
+        </fieldset>
+        <fieldset class="s2-job-fieldset">
+          <legend>Yêu cầu và quyền lợi</legend>
+          <div class="s2-job-fields">
+            <label>Cấp bậc<input name="level" maxlength="80" placeholder="Junior, Intern"></label>
+            <label>Kinh nghiệm<input name="experience" maxlength="120" placeholder="Không yêu cầu"></label>
+            <label>Đối tượng<input name="target" maxlength="160" placeholder="Sinh viên năm 3–4"></label>
+            <label>Hạn đăng *<input name="expiresAt" type="date" required></label>
+            <label class="s2-job-field-wide">Kỹ năng (mỗi dòng: tên | required/preferred | trọng số 1–100)<textarea name="skillCriteria" rows="4" placeholder="JavaScript | required | 30&#10;React | preferred | 15"></textarea></label>
+            <label class="s2-job-field-wide">Yêu cầu<textarea name="requirements" rows="3" maxlength="6000" placeholder="Kỹ năng, kiến thức hoặc điều kiện cần có"></textarea></label>
+            <label class="s2-job-field-wide">Quyền lợi<textarea name="benefits" rows="3" maxlength="4000" placeholder="Lương thưởng, phúc lợi và cơ hội phát triển"></textarea></label>
+            <label class="s2-job-field-wide">Quy trình tuyển dụng<textarea name="recruitmentProcess" rows="2" maxlength="2000" placeholder="Các vòng tuyển dụng và thời gian dự kiến"></textarea></label>
+          </div>
+        </fieldset>
+        <fieldset class="s2-job-fieldset">
+          <legend>Trọng số đánh giá ứng viên</legend>
+          <div class="s2-job-fields s2-job-weights">
+            <label>Kỹ năng (%)<input name="weightSkills" type="number" min="0" max="100" value="60"></label>
+            <label>Học vấn (%)<input name="weightEducation" type="number" min="0" max="100" value="15"></label>
+            <label>Kinh nghiệm (%)<input name="weightExperience" type="number" min="0" max="100" value="15"></label>
+            <label>Ngoại ngữ (%)<input name="weightLanguages" type="number" min="0" max="100" value="5"></label>
+            <label>Dự án (%)<input name="weightProjects" type="number" min="0" max="100" value="5"></label>
+          </div>
+        </fieldset>
+        <div class="s2-form-actions">
+          <button class="s2-button" type="submit" name="publish" value="true">Đăng tuyển · gửi kiểm duyệt</button>
+          <button class="s2-button s2-secondary" type="submit" name="draft" value="true">Lưu bản nháp</button>
+        </div>
+      </form>
     </section>
-    <section class="s2-panel"><div class="s2-panel-title"><div><span class="s2-step">02</span><h2>Tin tuyển dụng của tôi</h2></div><button class="s2-button s2-secondary" id="reload">Làm mới</button></div><div id="my-jobs" class="s2-job-list"><p class="s2-muted">Đang tải…</p></div></section>
-  </main><footer class="s2-footer">Ketnoi · Không gian tuyển dụng</footer>
-</body></html>
+    <section class="s2-panel">
+      <div class="s2-panel-title"><div><span class="s2-step">02</span><h2>Tin tuyển dụng của tôi</h2></div><button class="s2-button s2-secondary" id="reload" type="button">Làm mới</button></div>
+      <div id="my-jobs" class="s2-job-list"><p class="s2-muted">Đang tải…</p></div>
+    </section>
+  </main>
+  <footer class="s2-footer">Ketnoi · Không gian tuyển dụng</footer>
+</body>
+</html>

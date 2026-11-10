@@ -27,15 +27,15 @@ async function init() {
 }
 $('#job-form').addEventListener('submit', async event => {
   event.preventDefault(); const form = event.currentTarget; const button = event.submitter; button.disabled = true;
-  const source = { ...Object.fromEntries(new FormData(form)), ...Object.fromEntries(new FormData($('#job-extra-form'))) };
-  source.skillCriteria = source.skillCriteria.split('\n').map(line => { const [skill, importance = 'required', weight = '1'] = line.split('|').map(value => value.trim()); return skill ? { skill, importance, weight: Number(weight) || 1 } : null; }).filter(Boolean);
+  const source = Object.fromEntries(new FormData(form));
+  source.skillCriteria = String(source.skillCriteria || '').split('\n').map(line => { const [skill, importance = 'required', weight = '1'] = line.split('|').map(value => value.trim()); return skill ? { skill, importance, weight: Number(weight) || 1 } : null; }).filter(Boolean);
   source.criteriaWeights = { skills: source.weightSkills, education: source.weightEducation, experience: source.weightExperience, languages: source.weightLanguages, projects: source.weightProjects };
   source.status = button.name === 'draft' ? 'draft' : 'pending_review';
   if (source.status !== 'draft' && !source.expiresAt) { notice('Tin đăng tuyển cần có hạn đăng.', true); button.disabled = false; return; }
   const editingId = form.dataset.editing;
   try {
     await api(editingId ? `/api/employer/jobs/${encodeURIComponent(editingId)}` : '/api/employer/jobs', { method: editingId ? 'PATCH' : 'POST', body: JSON.stringify({ job: source }) });
-    form.reset(); $('#job-extra-form').reset(); delete form.dataset.editing;
+    form.reset(); delete form.dataset.editing;
     notice(editingId ? 'Đã cập nhật tin và gửi kiểm duyệt lại.' : source.status === 'draft' ? 'Đã lưu bản nháp.' : 'Đã gửi tin vào hàng đợi kiểm duyệt.'); await loadJobs();
   } catch (error) { notice(error.message, true); } finally { button.disabled = false; }
 });
@@ -44,7 +44,7 @@ $('#my-jobs').addEventListener('click', async event => {
   const edit = event.target.closest('[data-edit]'); const action = event.target.closest('[data-clone],[data-pause],[data-close],[data-renew]');
   if (edit) {
     const job = knownJobs.get(edit.dataset.edit); if (!job) return;
-    const form = $('#job-form'); fill(form, job); fill($('#job-extra-form'), { ...job, skillCriteria: (job.skillCriteria || job.skills || []).map(item => `${item.skill || item} | ${item.importance || 'required'} | ${item.weight || 1}`).join('\n'), weightSkills: job.criteriaWeights?.skills, weightEducation: job.criteriaWeights?.education, weightExperience: job.criteriaWeights?.experience, weightLanguages: job.criteriaWeights?.languages, weightProjects: job.criteriaWeights?.projects });
+    const form = $('#job-form'); fill(form, { ...job, expiresAt: job.expiresAt?.slice(0, 10), skillCriteria: (job.skillCriteria || job.skills || []).map(item => `${item.skill || item} | ${item.importance || 'required'} | ${item.weight || 1}`).join('\n'), weightSkills: job.criteriaWeights?.skills, weightEducation: job.criteriaWeights?.education, weightExperience: job.criteriaWeights?.experience, weightLanguages: job.criteriaWeights?.languages, weightProjects: job.criteriaWeights?.projects });
     form.dataset.editing = job.id; form.scrollIntoView({ behavior: 'smooth', block: 'center' }); form.elements.namedItem('title').focus(); notice('Đang chỉnh sửa tin. Gửi lại sẽ đưa tin về hàng đợi kiểm duyệt.');
   }
   if (action) {
