@@ -13,6 +13,18 @@ async function request(path, options = {}) {
   if (!response.ok) { const error = new Error(data.error || 'Đã có lỗi xảy ra.'); error.status = response.status; throw error; }
   return data;
 }
+function postLoginDestination(user, requestedPath) {
+  if (!requestedPath) return '';
+  const path = new URL(requestedPath, window.location.origin).pathname;
+  const common = path === '/' || path === '/index.html' || path === '/jobs.html' || path.startsWith('/jobs/') || ['/matches.html', '/ai-tools.html', '/notifications.html'].includes(path);
+  const allowedByRole = {
+    student: common || ['/apply.html', '/cv.html', '/applications.html', '/my-jobs.html'].includes(path),
+    employer: common || ['/employer.html', '/employer-profile.html', '/ats.html'].includes(path),
+    admin: path === '/' || path === '/index.html' || path === '/moderation.html'
+  };
+  if (allowedByRole[user?.role]) return requestedPath;
+  return ({ student: '/jobs.html', employer: '/employer.html', admin: '/moderation.html' })[user?.role] || '/';
+}
 function showToast(message) {
   toast.textContent = message;
   toast.classList.add('show');
@@ -209,7 +221,21 @@ document.addEventListener('submit', async event => {
   if (event.target.id === 'login-form') {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.target));
-    try { const result = await request('/api/login', { method: 'POST', body: JSON.stringify(data) }); currentUser = result.user; updateNav(); if (authReturnPath) { window.location.assign(authReturnPath); return; } if (currentUser.role === 'student' && !currentUser.profile?.onboardingCompleted) onboardingView(currentUser.profile || {}); else openDashboard(currentUser); showToast('Đăng nhập thành công.'); }
+    try {
+      const result = await request('/api/login', { method: 'POST', body: JSON.stringify(data) });
+      currentUser = result.user;
+      updateNav();
+      const destination = postLoginDestination(currentUser, authReturnPath);
+      if (destination && !(currentUser.role === 'student' && destination === '/jobs.html' && !currentUser.profile?.onboardingCompleted)) {
+        authReturnPath = '';
+        window.location.assign(destination);
+        return;
+      }
+      authReturnPath = '';
+      if (currentUser.role === 'student' && !currentUser.profile?.onboardingCompleted) onboardingView(currentUser.profile || {});
+      else openDashboard(currentUser);
+      showToast('Đăng nhập thành công.');
+    }
     catch (error) { loginView(error.message); }
   }
   if (event.target.id === 'forgot-form') {

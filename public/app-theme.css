@@ -1,6 +1,63 @@
 /* Ketnoi application palette: shared accents for the working screens. */
 :root{--app-teal:#238b77;--app-teal-deep:#176553;--app-violet:#8059b5;--app-violet-soft:#f2eaff;--app-coral:#e98f68;--app-coral-soft:#fff0e7;--app-mint:#e5f5ee;--app-blue-soft:#eaf2ff}
 
+/* One calm header and a clear, consistent interaction language. */
+.site-header{background:linear-gradient(105deg,rgba(244,240,252,.97),rgba(240,250,246,.97) 58%,rgba(255,247,239,.97));border-bottom-color:#e6dff0}
+.site-nav a[aria-current="page"]{color:var(--app-violet)!important}
+.site-nav a[aria-current="page"]:after{width:100%;background:linear-gradient(90deg,var(--app-violet),var(--app-coral))}
+.site-actions .btn-primary{background:linear-gradient(110deg,var(--app-teal-deep),var(--app-teal));box-shadow:0 5px 15px rgba(35,139,119,.16);transition:transform .18s,box-shadow .18s,background .18s}
+.site-actions .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(35,139,119,.23)}
+.site-actions .btn-quiet:hover{color:var(--app-violet)}
+.s2-shell,.s3-shell,.s4-shell,.s5-shell{color:#22372e}
+body:has(.s2-shell),body:has(.s3-shell),body:has(.s4-shell),body:has(.s5-shell){background:radial-gradient(ellipse at 94% 3%,rgba(221,205,250,.27),transparent 30%),radial-gradient(ellipse at 5% 70%,rgba(203,238,223,.3),transparent 32%),#fafbf9}
+.s2-shell a:not(.s2-button),.s3-shell a:not(.s3-button),.s4-shell a:not(.s4-button),.s5-shell a:not(.s5-button){color:#674c98;text-decoration:none}
+.s2-shell a:not(.s2-button):hover,.s3-shell a:not(.s3-button):hover,.s4-shell a:not(.s4-button):hover,.s5-shell a:not(.s5-button):hover{color:#237a68;text-decoration:underline;text-underline-offset:3px}
+.s2-detail-link,.s2-back-link{color:#674c98!important}
+.s2-detail-link:hover,.s2-back-link:hover{color:#237a68!important}
+.s2-heading h1,.s3-hero h1,.s4-heading h1,.s5-intro h1{letter-spacing:-.045em}
+.s2-eyebrow,.s3-eyebrow,.s4-eyebrow,.s5-eyebrow{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid #e5daf3;border-radius:999px;background:linear-gradient(100deg,#f6f0ff,#eef9f4);}
+.s2-button,.s3-button,.s4-button,.s5-button{transition:transform .18s,box-shadow .18s,background .18s}
+.s2-button:hover:not(:disabled),.s3-button:hover:not(:disabled),.s4-button:hover:not(:disabled),.s5-button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 18px rgba(51,76,63,.16)}
+.s2-panel,.s3-panel,.s4-panel,.s5-card,.s5-tool-card{transition:transform .2s,border-color .2s,box-shadow .2s}
+.s2-public-card:hover,.s2-job-row:hover,.s3-cv-card:hover,.s4-app-card:hover,.s5-card:hover,.s5-tool-card:hover{transform:translateY(-2px);box-shadow:0 13px 30px rgba(64,54,96,.11)}
+.s2-grid input,.s2-grid select,.s2-grid textarea,.s2-search input,.s2-search select,.s2-job-fields input,.s2-job-fields select,.s2-job-fields textarea,.s2-public-card input,.s2-public-card textarea,.s3-field input,.s3-field textarea,.s3-sections-form textarea,.s4-field input,.s4-field select,.s4-field textarea,.s4-toolbar input,.s4-toolbar select,.s5-tool-form input,.s5-tool-form textarea,.s5-tool-result textarea{transition:border-color .18s,box-shadow .18s,background-color .18s}
+.s2-grid input:focus-visible,.s2-grid select:focus-visible,.s2-grid textarea:focus-visible,.s2-search input:focus-visible,.s2-search select:focus-visible,.s2-job-fields input:focus-visible,.s2-job-fields select:focus-visible,.s2-job-fields textarea:focus-visible,.s3-field input:focus-visible,.s3-field textarea:focus-visible,.s3-sections-form textarea:focus-visible,.s4-field input:focus-visible,.s4-field select:focus-visible,.s4-field textarea:focus-visible,.s4-toolbar input:focus-visible,.s4-toolbar select:focus-visible,.s5-tool-form input:focus-visible,.s5-tool-form textarea:focus-visible,.s5-tool-result textarea:focus-visible{border-color:#9873c6;box-shadow:0 0 0 3px #eee7f8;outline:0}
+.s2-tabs{border-color:#e3d9ef}
+.s2-tabs button{border-radius:9px 9px 0 0;transition:background .18s,color .18s}
+.s2-tabs button:hover{background:#f6f1fc;color:#674c98}
+.s2-tabs button[aria-selected=true]{color:#674c98;border-color:#9873c6}
+.s2-metric{background:linear-gradient(145deg,#fff,#f8f5ff);border-color:#e6dff0}
+.s2-metric:nth-child(4n+1) strong{color:#23836d}.s2-metric:nth-child(4n+2) strong{color:#8059b5}.s2-metric:nth-child(4n+3) strong{color:#d57a53}.s2-metric:nth-child(4n) strong{color:#5579b1}
+.s2-pagination button{border-color:#e1d7ef;color:#654b93;transition:background .18s,color .18s,transform .18s}
+.s2-pagination button:hover{transform:translateY(-1px);background:#f2eaff}
+.s2-pagination button[aria-current=page]{background:var(--app-violet);border-color:var(--app-violet)}
+.s2-empty,.s3-empty,.s4-empty{background:linear-gradient(120deg,#f1faf6,#f6f1fc,#fff8f2);border-color:#ded4ed}
+.s2-public-card .s2-actions{align-items:center;flex-wrap:wrap}
+.s2-public-card .s2-actions .s2-detail-link{display:inline-flex;align-items:center;gap:7px}
+.s2-public-card [data-save].is-saved{background:#e6f5ed;color:#287355;border-color:#cfe9db}
+.s2-notice.ok,.s3-inline-message:not(.error){background:#e6f5ed;color:#287355}
+.s2-footer,.s3-footer,.s4-footer{background:linear-gradient(100deg,#f4f0fc,#f0faf6 58%,#fff7ef);border-color:#e6dff0}
+.s2-public-card .s2-salary,.s2-detail-salary{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#e6f5ed;color:#23755e;font-weight:750}
+.s3-cv-card{transition:transform .18s,border-color .18s,box-shadow .18s}
+.s3-cv-actions button:hover{border-color:#cfbce8;color:#694a99}
+.s3-review-fields .s3-field:nth-child(3n+1){background:linear-gradient(145deg,#fff,#f3faf6)}
+.s3-review-fields .s3-field:nth-child(3n+2){background:linear-gradient(145deg,#fff,#f7f3fc)}
+.s3-review-fields .s3-field:nth-child(3n){background:linear-gradient(145deg,#fff,#fff7f0)}
+.s4-row{border-color:#e7e0ef}
+.s4-question-row{border-color:#e7e0ef}
+.s4-timeline span{border-radius:5px 5px 0 0;background:rgba(255,255,255,.6)}
+.s4-timeline span:nth-child(3n+1).done{border-color:#58aa84;color:#287355}
+.s4-timeline span:nth-child(3n+2).done{border-color:#9d7bcf;color:#704ca4}
+.s4-timeline span:nth-child(3n).done{border-color:#ed9a70;color:#a85b3c}
+.s4-app-card:hover{border-color:#c4b1e2;background:#fff}
+.s4-toolbar input:focus,.s4-toolbar select:focus{border-color:#9873c6;box-shadow:0 0 0 3px #eee7f8;outline:0}
+.s5-reasons summary{color:#674c98}
+.s5-reasons summary:hover{color:#237a68}
+.s5-card-foot{border-color:#ece5f2}
+.s5-tool-divider:before,.s5-tool-divider:after{background:#e5dcef}
+.s5-tool-form input:hover,.s5-tool-form textarea:hover,.s4-field input:hover,.s4-field select:hover,.s4-field textarea:hover{border-color:#c5b3e1}
+@media(prefers-reduced-motion:reduce){.s2-button,.s3-button,.s4-button,.s5-button,.s2-public-card,.s2-job-row,.s3-cv-card,.s4-app-card,.s5-card,.s5-tool-card{transition:none!important}}
+
 /* Job search, publishing and moderation */
 .s2-header{background:linear-gradient(100deg,#f4f1ff,#f3fbf8 56%,#fff7f0);border-color:#e8e0f1}
 .s2-heading h1 em{color:var(--app-violet)}

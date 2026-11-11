@@ -3,6 +3,17 @@
   const onHome = pathname === '/' || pathname === '/index.html';
   const header = document.querySelector('header');
   if (!header) return;
+  let renderedIdentity = '';
+
+  function userIdentity(user) { return user ? `${user.id || user.email}:${user.role || ''}` : ''; }
+  function allowedForRole(role, path) {
+    const common = path === '/' || path === '/index.html' || path === '/jobs.html' || path.startsWith('/jobs/') || ['/matches.html', '/ai-tools.html', '/notifications.html'].includes(path);
+    if (role === 'student') return common || ['/apply.html', '/cv.html', '/applications.html', '/my-jobs.html'].includes(path);
+    if (role === 'employer') return common || ['/employer.html', '/employer-profile.html', '/ats.html'].includes(path);
+    if (role === 'admin') return path === '/' || path === '/index.html' || path === '/moderation.html';
+    return common;
+  }
+  function roleHome(role) { return ({ student: '/jobs.html', employer: '/employer.html', admin: '/moderation.html' })[role] || '/'; }
 
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
   const routesByRole = {
@@ -49,6 +60,7 @@
   function renderNavigation(user) {
     const nav = document.querySelector('#primary-nav');
     if (!nav) return;
+    renderedIdentity = userIdentity(user);
     const links = routesByRole[user?.role] || routesByRole.guest;
     const selected = activeHref(user);
     nav.innerHTML = links.map(([href, label]) => `<a${href === '/notifications.html' ? ' id="s4-notifications-link"' : ''} href="${href}"${href === selected ? ' aria-current="page"' : ''}>${label}</a>`).join('');
@@ -80,10 +92,24 @@
   window.ketnoiUpdateSiteNav = renderNavigation;
   window.addEventListener('ketnoi:auth-changed', event => renderNavigation(event.detail?.user || null));
   renderNavigation(null);
-  fetch('/api/me', { credentials: 'same-origin' })
+  fetch('/api/me', { credentials: 'same-origin', cache: 'no-store' })
     .then(response => response.ok ? response.json() : null)
     .then(data => renderNavigation(data?.user || null))
     .catch(() => renderNavigation(null));
+
+  window.addEventListener('pageshow', event => {
+    if (!event.persisted) return;
+    fetch('/api/me', { credentials: 'same-origin', cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        const user = data?.user || null;
+        if (userIdentity(user) === renderedIdentity) { renderNavigation(user); return; }
+        if (user && !allowedForRole(user.role, pathname)) window.location.replace(roleHome(user.role));
+        else if (!user && ['/employer-profile.html', '/ats.html', '/moderation.html'].includes(pathname)) window.location.replace('/');
+        else window.location.reload();
+      })
+      .catch(() => window.location.reload());
+  });
 
   // The homepage account app handles its own mobile menu through delegated events.
   if (onHome) return;
