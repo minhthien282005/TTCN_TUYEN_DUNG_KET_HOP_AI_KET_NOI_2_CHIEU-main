@@ -6,6 +6,7 @@ const sprint2Api = require('../Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tì
 const sprint3Api = require('../Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding/api');
 const sprint4Api = require('../Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo/api');
 const sprint5Api = require('../Sprint 5_ Matching hai chiều, Giải thích & Hoàn thiện/api');
+const sprint6Api = require('../Sprint 6_ Lời mời, Mutual Match, Chat Realtime & Sourcing/api');
 
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
@@ -130,6 +131,8 @@ async function api(req, res, url) {
   if (sprint4Response !== null) return;
   const sprint5Response = await sprint5Api.handleRequest(req, res, url, user, { db, save, audit });
   if (sprint5Response !== null) return;
+  const sprint6Response = await sprint6Api.handleRequest(req, res, url, user, { db, save, audit });
+  if (sprint6Response !== null) return;
   const sprint3Response = await sprint3Api.handleRequest(req, res, url, user, { db, save, audit });
   if (sprint3Response !== null) return;
   if (req.method === 'GET' && url.pathname === '/api/me') return json(res, 200, { user: user ? publicUser(user) : null });
@@ -192,7 +195,7 @@ async function api(req, res, url) {
     if (!account) return json(res, 400, { error: 'Liên kết đặt lại không hợp lệ hoặc đã hết hạn.' });
     if (String(body.password || '').length < 8 || String(body.password).length > 128) return json(res, 400, { error: 'Mật khẩu cần có từ 8 đến 128 ký tự.' });
     account.passwordHash = await hashPassword(String(body.password)); delete account.resetToken; delete account.resetTokenHash; delete account.resetExpiresAt;
-    db.sessions = db.sessions.filter(s => s.userId !== account.id); audit(account.id, 'account.password_reset'); save();
+    db.sessions = db.sessions.filter(s => s.userId !== account.id); sprint6Api.closeUserStreams(account.id); audit(account.id, 'account.password_reset'); save();
     return json(res, 200, { message: 'Mật khẩu đã được đặt lại. Bạn có thể đăng nhập.' });
   }
   if (req.method === 'POST' && url.pathname === '/api/login') {
@@ -210,14 +213,16 @@ async function api(req, res, url) {
     attempts.delete(key);
     if (account.lockedAt) return json(res, 403, { error: 'Tài khoản đang bị khóa. Liên hệ quản trị viên để được hỗ trợ.' });
     if (!account.verified) return json(res, 403, { error: 'Hãy xác minh email trước khi đăng nhập.' });
+    if (user && user.id !== account.id) sprint6Api.closeUserStreams(user.id);
     const token = crypto.randomBytes(32).toString('hex');
     db.sessions = db.sessions.filter(s => s.expiresAt > Date.now() && s.userId !== account.id);
+    sprint6Api.closeUserStreams(account.id);
     db.sessions.push({ tokenHash: tokenHash(token), userId: account.id, expiresAt: Date.now() + 7 * 24 * 60 * 60_000 });
     audit(account.id, 'account.login'); save();
     return json(res, 200, { user: publicUser(account) }, { 'Set-Cookie': sessionCookie(token) });
   }
   if (req.method === 'POST' && url.pathname === '/api/logout') {
-    if (user) { db.sessions = db.sessions.filter(s => s.userId !== user.id); audit(user.id, 'account.logout'); save(); }
+    if (user) { db.sessions = db.sessions.filter(s => s.userId !== user.id); sprint6Api.closeUserStreams(user.id); audit(user.id, 'account.logout'); save(); }
     return json(res, 200, { message: 'Đã đăng xuất.' }, { 'Set-Cookie': clearCookie() });
   }
   if (req.method === 'POST' && url.pathname === '/api/refresh') {
@@ -250,7 +255,7 @@ async function api(req, res, url) {
     const body = await readBody(req);
     if (!(await verifyPassword(String(body.currentPassword || ''), user.passwordHash))) return json(res, 400, { error: 'Mật khẩu hiện tại chưa chính xác.' });
     if (String(body.password || '').length < 8 || String(body.password).length > 128) return json(res, 400, { error: 'Mật khẩu mới cần có từ 8 đến 128 ký tự.' });
-    user.passwordHash = await hashPassword(String(body.password)); db.sessions = db.sessions.filter(s => s.userId !== user.id); audit(user.id, 'account.password_change'); save();
+    user.passwordHash = await hashPassword(String(body.password)); db.sessions = db.sessions.filter(s => s.userId !== user.id); sprint6Api.closeUserStreams(user.id); audit(user.id, 'account.password_change'); save();
     return json(res, 200, { message: 'Đã đổi mật khẩu. Vui lòng đăng nhập lại.' }, { 'Set-Cookie': clearCookie() });
   }
   if (req.method === 'POST' && url.pathname === '/api/change-email') {
@@ -261,7 +266,7 @@ async function api(req, res, url) {
     if (db.users.some(u => u.email === email && u.id !== user.id)) return json(res, 409, { error: 'Email này đã được sử dụng.' });
     const verifyToken = crypto.randomBytes(32).toString('hex');
     user.email = email; user.verified = false; user.verifyTokenHash = tokenHash(verifyToken); user.verifyExpiresAt = Date.now() + 15 * 60_000;
-    audit(user.id, 'account.email_change'); db.sessions = db.sessions.filter(s => s.userId !== user.id); save();
+    audit(user.id, 'account.email_change'); db.sessions = db.sessions.filter(s => s.userId !== user.id); sprint6Api.closeUserStreams(user.id); save();
     const verifyUrl = `${APP_BASE_URL}/?verify=${verifyToken}`;
     try { await sendMail(email, 'Xác minh email Ketnoi', `<p><a href="${verifyUrl}">Xác minh email mới</a> · Liên kết có hiệu lực 15 phút.</p>`); }
     catch (error) { console.error(JSON.stringify({ event: 'email.delivery_failed', purpose: 'email_change', error: error.message })); }
@@ -305,6 +310,7 @@ async function api(req, res, url) {
     await sprint3Api.deleteUserData(db, user);
     sprint4Api.deleteUserData(db, user);
     sprint5Api.deleteUserData(db, user);
+    sprint6Api.deleteUserData(db, user);
     db.sessions = db.sessions.filter(s => s.userId !== user.id); audit(user.id, 'account.delete'); save();
     return json(res, 200, { message: 'Tài khoản đã được xóa mềm.' }, { 'Set-Cookie': clearCookie() });
   }
@@ -353,8 +359,10 @@ const server = http.createServer(async (req, res) => {
     const isSprint4Asset = url.pathname.startsWith('/sprint4/') || sprint4Pages.includes(url.pathname);
     const sprint5Pages = ['/matches.html', '/ai-tools.html'];
     const isSprint5Asset = url.pathname.startsWith('/sprint5/') || sprint5Pages.includes(url.pathname);
-    const assetRoot = isSprintAsset ? __dirname : isSprint2Asset ? path.resolve(__dirname, '..', 'Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt') : isSprint3Asset ? path.resolve(__dirname, '..', 'Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding') : isSprint4Asset ? path.resolve(__dirname, '..', 'Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo') : isSprint5Asset ? path.resolve(__dirname, '..', 'Sprint 5_ Matching hai chiều, Giải thích & Hoàn thiện') : PUBLIC;
-    const requested = isSprintAsset ? 'app.js' : isSprint2Asset ? (url.pathname.startsWith('/sprint2/') ? decodeURIComponent(url.pathname.slice('/sprint2/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint3Asset ? (url.pathname.startsWith('/sprint3/') ? decodeURIComponent(url.pathname.slice('/sprint3/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint4Asset ? (url.pathname.startsWith('/sprint4/') ? decodeURIComponent(url.pathname.slice('/sprint4/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint5Asset ? (url.pathname.startsWith('/sprint5/') ? decodeURIComponent(url.pathname.slice('/sprint5/'.length)) : decodeURIComponent(url.pathname.slice(1))) : url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
+    const isSprint6Asset = url.pathname.startsWith('/sprint6/') || url.pathname === '/network.html';
+    const sprint6Root = path.resolve(__dirname, '..', 'Sprint 6_ Lời mời, Mutual Match, Chat Realtime & Sourcing');
+    const assetRoot = isSprintAsset ? __dirname : isSprint2Asset ? path.resolve(__dirname, '..', 'Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt') : isSprint3Asset ? path.resolve(__dirname, '..', 'Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding') : isSprint4Asset ? path.resolve(__dirname, '..', 'Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo') : isSprint5Asset ? path.resolve(__dirname, '..', 'Sprint 5_ Matching hai chiều, Giải thích & Hoàn thiện') : isSprint6Asset ? sprint6Root : PUBLIC;
+    const requested = isSprintAsset ? 'app.js' : isSprint2Asset ? (url.pathname.startsWith('/sprint2/') ? decodeURIComponent(url.pathname.slice('/sprint2/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint3Asset ? (url.pathname.startsWith('/sprint3/') ? decodeURIComponent(url.pathname.slice('/sprint3/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint4Asset ? (url.pathname.startsWith('/sprint4/') ? decodeURIComponent(url.pathname.slice('/sprint4/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint5Asset ? (url.pathname.startsWith('/sprint5/') ? decodeURIComponent(url.pathname.slice('/sprint5/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint6Asset ? (url.pathname.startsWith('/sprint6/') ? decodeURIComponent(url.pathname.slice('/sprint6/'.length)) : decodeURIComponent(url.pathname.slice(1))) : url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
     const target = path.resolve(assetRoot, requested);
     if (!target.startsWith(`${assetRoot}${path.sep}`) && target !== path.join(PUBLIC, 'index.html')) return json(res, 403, { error: 'Forbidden.' });
     fs.readFile(target, (err, content) => {
