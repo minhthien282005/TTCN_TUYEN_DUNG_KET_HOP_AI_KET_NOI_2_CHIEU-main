@@ -140,7 +140,7 @@ module.exports = {
       if (!body) return;
       const item = db.sprint6Invitations.find(value => value.id === invitationRespond[1] && value.studentId === user.id);
       if (!isStudent) return respond(res, 403, { error: 'Chỉ sinh viên được phản hồi lời mời.' });
-      if (!item || item.status !== 'pending' || Date.parse(item.expiresAt) <= Date.now()) return respond(res, 404, { error: 'Lời mời không còn hiệu lực.' });
+      if (!item || item.status !== 'pending' || Date.parse(item.expiresAt) <= Date.now() || blocked(db, item.studentId, item.employerId)) return respond(res, 404, { error: 'Lời mời không còn hiệu lực.' });
       if (!['accept', 'decline'].includes(body.action)) return respond(res, 400, { error: 'Chọn đồng ý hoặc từ chối.' });
       item.status = body.action === 'accept' ? 'accepted' : 'declined'; item.respondedAt = new Date().toISOString();
       let match = null;
@@ -149,6 +149,17 @@ module.exports = {
       audit?.(user.id, `sprint6.invitation.${item.status}`, 'sprint6'); save();
       return respond(res, 200, { invitation: item, match });
     });
+
+    const invitationWithdraw = path.match(/^\/api\/sprint6\/invitations\/([\w-]+)$/);
+    if (req.method === 'DELETE' && invitationWithdraw) {
+      if (isStudent) return respond(res, 403, { error: 'Chỉ nhà tuyển dụng gửi lời mời mới có thể thu hồi.' });
+      const item = db.sprint6Invitations.find(value => value.id === invitationWithdraw[1] && value.employerId === user.id && value.status === 'pending');
+      if (!item) return respond(res, 404, { error: 'Không tìm thấy lời mời đang chờ để thu hồi.' });
+      item.status = 'withdrawn'; item.respondedAt = new Date().toISOString();
+      notify(db, item.studentId, 'Lời mời đã được thu hồi', 'Nhà tuyển dụng đã thu hồi lời mời trao đổi.', '/network.html');
+      audit?.(user.id, 'sprint6.invitation.withdrawn', 'sprint6'); save();
+      return respond(res, 200, { invitation: item });
+    }
 
     if (req.method === 'POST' && path === '/api/sprint6/interests') return read().then(body => {
       if (!body) return;
@@ -166,7 +177,7 @@ module.exports = {
       if (!body) return;
       const item = db.sprint6Interests.find(value => value.id === interestRespond[1] && value.employerId === user.id);
       if (isStudent) return respond(res, 403, { error: 'Chỉ nhà tuyển dụng được phản hồi quan tâm.' });
-      if (!item || item.status !== 'pending' || Date.parse(item.expiresAt) <= Date.now()) return respond(res, 404, { error: 'Lời quan tâm không còn hiệu lực.' });
+      if (!item || item.status !== 'pending' || Date.parse(item.expiresAt) <= Date.now() || blocked(db, item.studentId, item.employerId)) return respond(res, 404, { error: 'Lời quan tâm không còn hiệu lực.' });
       if (!['accept', 'decline'].includes(body.action)) return respond(res, 400, { error: 'Chọn đồng ý hoặc từ chối.' });
       item.status = body.action === 'accept' ? 'accepted' : 'declined'; item.respondedAt = new Date().toISOString();
       let match = null;
@@ -175,6 +186,17 @@ module.exports = {
       audit?.(user.id, `sprint6.interest.${item.status}`, 'sprint6'); save();
       return respond(res, 200, { interest: item, match });
     });
+
+    const interestWithdraw = path.match(/^\/api\/sprint6\/interests\/([\w-]+)$/);
+    if (req.method === 'DELETE' && interestWithdraw) {
+      if (!isStudent) return respond(res, 403, { error: 'Chỉ sinh viên gửi quan tâm mới có thể thu hồi.' });
+      const item = db.sprint6Interests.find(value => value.id === interestWithdraw[1] && value.studentId === user.id && value.status === 'pending');
+      if (!item) return respond(res, 404, { error: 'Không tìm thấy yêu cầu đang chờ để thu hồi.' });
+      item.status = 'withdrawn'; item.respondedAt = new Date().toISOString();
+      notify(db, item.employerId, 'Ứng viên đã thu hồi quan tâm', 'Ứng viên đã thu hồi yêu cầu trao đổi về công việc.', '/network.html');
+      audit?.(user.id, 'sprint6.interest.withdrawn', 'sprint6'); save();
+      return respond(res, 200, { interest: item });
+    }
 
     if (req.method === 'GET' && path === '/api/sprint6/matches') {
       const matches = db.sprint6Matches.filter(item => item.status === 'active' && (isStudent ? item.studentId === user.id : item.employerId === user.id)).map(item => {
@@ -185,7 +207,7 @@ module.exports = {
     }
 
     if (req.method === 'GET' && path === '/api/sprint6/conversations') {
-      const conversations = db.sprint6Conversations.filter(item => item.participantIds.includes(user.id)).sort((a, b) => (b.lastMessageAt || b.createdAt).localeCompare(a.lastMessageAt || a.createdAt)).map(item => {
+      const conversations = db.sprint6Conversations.filter(item => item.participantIds.includes(user.id) && db.sprint6Matches.some(match => match.id === item.matchId && match.status === 'active') && !blocked(db, ...item.participantIds)).sort((a, b) => (b.lastMessageAt || b.createdAt).localeCompare(a.lastMessageAt || a.createdAt)).map(item => {
         const match = db.sprint6Matches.find(value => value.id === item.matchId); const other = person(db, isStudent ? match?.employerId : match?.studentId); const job = (db.jobs || []).find(value => value.id === match?.jobId); const messages = db.sprint6Messages.filter(value => value.conversationId === item.id);
         const last = messages[messages.length - 1];
         return { id: item.id, jobTitle: job?.title || 'Vị trí tuyển dụng', otherName: isStudent ? (db.companies || []).find(value => value.ownerId === other?.id)?.name || userName(other) : userName(other), lastMessage: last?.body || '', lastMessageAt: item.lastMessageAt, unread: messages.filter(value => value.senderId !== user.id && Date.parse(value.createdAt) > Date.parse(item.readAt?.[user.id] || '')).length };
@@ -196,7 +218,8 @@ module.exports = {
     const conversationId = path.match(/^\/api\/sprint6\/conversations\/([\w-]+)$/);
     if (req.method === 'GET' && conversationId) {
       const conversation = db.sprint6Conversations.find(item => item.id === conversationId[1] && item.participantIds.includes(user.id));
-      if (!conversation) return respond(res, 404, { error: 'Không tìm thấy cuộc trò chuyện.' });
+      const match = conversation && db.sprint6Matches.find(item => item.id === conversation.matchId && item.status === 'active');
+      if (!conversation || !match || blocked(db, ...conversation.participantIds)) return respond(res, 404, { error: 'Không tìm thấy cuộc trò chuyện đang hoạt động.' });
       const after = Number(url.searchParams.get('after')) || 0;
       const messages = db.sprint6Messages.filter(item => item.conversationId === conversation.id && Date.parse(item.createdAt) > after).slice(-200).map(item => ({ id: item.id, senderId: item.senderId, senderName: userName(person(db, item.senderId)), body: item.body, createdAt: item.createdAt }));
       conversation.readAt ||= {};
@@ -208,7 +231,8 @@ module.exports = {
     if (req.method === 'POST' && messagePath) return read().then(body => {
       if (!body) return;
       const conversation = db.sprint6Conversations.find(item => item.id === messagePath[1] && item.participantIds.includes(user.id));
-      if (!conversation) return respond(res, 404, { error: 'Không tìm thấy cuộc trò chuyện.' });
+      const match = conversation && db.sprint6Matches.find(item => item.id === conversation.matchId && item.status === 'active');
+      if (!conversation || !match || blocked(db, ...conversation.participantIds)) return respond(res, 404, { error: 'Không tìm thấy cuộc trò chuyện đang hoạt động.' });
       const messageBody = text(body.message, 2000);
       if (!messageBody) return respond(res, 400, { error: 'Tin nhắn không được để trống.' });
       const recent = db.sprint6Messages.filter(item => item.senderId === user.id && Date.now() - Date.parse(item.createdAt) < 60_000).length;
@@ -221,6 +245,19 @@ module.exports = {
       publish(conversation.participantIds, 'message', { conversationId: conversation.id, message: { id: message.id, senderId: message.senderId, senderName: userName(user), body: message.body, createdAt: message.createdAt } });
       return respond(res, 201, { message: { id: message.id, senderId: user.id, senderName: userName(user), body: message.body, createdAt: message.createdAt } });
     });
+
+    const blockPath = path.match(/^\/api\/sprint6\/conversations\/([\w-]+)\/block$/);
+    if (req.method === 'POST' && blockPath) {
+      const conversation = db.sprint6Conversations.find(item => item.id === blockPath[1] && item.participantIds.includes(user.id));
+      const match = conversation && db.sprint6Matches.find(item => item.id === conversation.matchId && item.status === 'active');
+      if (!conversation || !match) return respond(res, 404, { error: 'Không tìm thấy kết nối đang hoạt động.' });
+      const otherId = conversation.participantIds.find(id => id !== user.id);
+      if (!blocked(db, user.id, otherId)) db.sprint6Blocks.push({ blockerId: user.id, blockedId: otherId, createdAt: new Date().toISOString() });
+      match.status = 'closed'; match.closedAt = new Date().toISOString(); match.closedBy = user.id;
+      audit?.(user.id, 'sprint6.connection.blocked', 'sprint6'); save();
+      publish(conversation.participantIds, 'connection-closed', { conversationId: conversation.id });
+      return respond(res, 200, { blocked: true });
+    }
 
     if (req.method === 'GET' && path === '/api/sprint6/events') {
       const clients = streamClients.get(user.id) || new Set();
