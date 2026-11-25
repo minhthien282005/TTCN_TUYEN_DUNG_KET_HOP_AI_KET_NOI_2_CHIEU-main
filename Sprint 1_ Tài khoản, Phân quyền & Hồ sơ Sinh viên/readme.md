@@ -29,6 +29,13 @@ Chạy từ thư mục gốc bằng `npm.cmd start`; không chạy server từ t
 - API kiểm tra quyền chủ hồ sơ, consent theo mục đích/phiên bản, audit log, xóa mềm tài khoản và giới hạn request.
 - Trang chủ responsive; matching, tin tuyển dụng, ứng tuyển và ATS thuộc các sprint sau.
 
+### REQ-S1-02/03/04/05 bổ sung
+
+- Bộ đếm đăng nhập sai và rate limit được lưu bền vững trong `securityState` của `data/db.json` ở runtime JSON hiện tại; migration SQL có bảng `auth_throttle_state` cho triển khai PostgreSQL.
+- Migration tạo từ điển `skills(name, category)` và liên kết `student_skills(student_id, skill_id, level, verified)`; hồ sơ onboarding nhận điều kiện lương tối thiểu, giờ làm Sáng/Chiều và hình thức Remote/Hybrid/Onsite.
+- Hồ sơ có URL GitHub, Behance/Figma và dự án đã triển khai; API chỉ chấp nhận URL HTTP/HTTPS có hostname và từ chối credential nhúng trong URL.
+- `student_deal_breakers` và `student_portfolio_links` là bảng chuẩn hóa cho triển khai PostgreSQL; runtime JSON vẫn giữ profile document cho tới khi chuyển đổi DB hoàn tất.
+
 ## Giới hạn
 
 `data/db.json` là prototype single-process; lockout/rate limits ở bộ nhớ. Mật khẩu dùng Node `scrypt` thay vì tiêu chí Argon2/bcrypt trong backlog. Email thật cần cấu hình Resend; staging chưa được triển khai và ứng dụng chưa nối PostgreSQL. Không đưa lên internet hoặc chạy nhiều replica trước khi xử lý các mục này. Xem `docs/delivery-status.md`.

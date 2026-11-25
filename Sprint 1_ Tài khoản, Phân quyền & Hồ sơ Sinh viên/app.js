@@ -88,7 +88,7 @@ function onboardingView(profile = {}, step = 0, error = '') {
   const fields = [
     `<label class="field"><span>Lĩnh vực quan tâm</span><select name="industry"><option value="">Chọn lĩnh vực</option>${categoryData.industries.map(item => `<option value="${escapeHtml(item)}" ${profile.industry === item ? 'selected' : ''}>${escapeHtml(item)}</option>`).join('')}</select></label><label class="field"><span>Ngành học</span><input name="major" value="${escapeHtml(profile.major || '')}" maxlength="120" placeholder="Ví dụ: Công nghệ thông tin"></label><label class="field"><span>Trường</span><select name="school"><option value="">Chọn trường</option>${categoryData.schools.map(item => `<option value="${escapeHtml(item)}" ${profile.school === item ? 'selected' : ''}>${escapeHtml(item)}</option>`).join('')}</select></label>`,
     `<label class="field"><span>Vị trí mong muốn (mỗi dòng một vị trí)</span><textarea name="desiredRoles" placeholder="Frontend Developer">${escapeHtml((profile.desiredRoles || []).join('\n'))}</textarea></label><label class="field"><span>Loại hình công việc</span><select name="jobType"><option value="">Chọn loại hình</option>${['Thực tập', 'Toàn thời gian', 'Bán thời gian', 'Freelance'].map(item => `<option value="${item}" ${profile.jobTypes?.includes(item) ? 'selected' : ''}>${item}</option>`).join('')}</select></label>`,
-    `<label class="field"><span>Địa điểm mong muốn</span><select name="location"><option value="">Chọn địa điểm</option>${categoryData.locations.map(item => `<option value="${escapeHtml(item)}" ${profile.location === item ? 'selected' : ''}>${escapeHtml(item)}</option>`).join('')}</select></label><p class="modal-intro">Bạn có thể bổ sung kỹ năng, học vấn và kinh nghiệm trong hồ sơ sau.</p>`
+    `<label class="field"><span>Địa điểm mong muốn</span><select name="location"><option value="">Chọn địa điểm</option>${categoryData.locations.map(item => `<option value="${escapeHtml(item)}" ${profile.location === item ? 'selected' : ''}>${escapeHtml(item)}</option>`).join('')}</select></label><label class="field"><span>Mức lương tối thiểu mong muốn (VND/tháng)</span><input name="minimumSalary" type="number" min="0" step="500000" value="${escapeHtml(profile.minimumSalary || '')}" placeholder="8000000"></label><fieldset class="field"><legend>Giờ làm việc khả dụng</legend><label><input type="checkbox" name="availableWorkHours" value="morning" ${(profile.availableWorkHours || []).includes('morning') ? 'checked' : ''}> Sáng</label> <label><input type="checkbox" name="availableWorkHours" value="afternoon" ${(profile.availableWorkHours || []).includes('afternoon') ? 'checked' : ''}> Chiều</label></fieldset><fieldset class="field span-two"><legend>Hình thức có thể làm</legend>${['remote', 'hybrid', 'onsite'].map(mode => `<label><input type="checkbox" name="preferredWorkModes" value="${mode}" ${(profile.preferredWorkModes || []).includes(mode) ? 'checked' : ''}> ${{ remote: 'Remote', hybrid: 'Hybrid', onsite: 'Onsite' }[mode]}</label> `).join('')}</fieldset><p class="modal-intro span-two">Bạn có thể bổ sung kỹ năng, học vấn và kinh nghiệm trong hồ sơ sau.</p>`
   ];
   setContent(`<h2 id="modal-title">Bắt đầu hồ sơ · ${step + 1}/3</h2><p class="modal-intro">Chọn thông tin giúp chúng tôi hiểu định hướng nghề nghiệp của bạn. Bạn có thể bỏ qua và cập nhật sau.</p><form id="onboarding-form" data-step="${step}">${fields[step]}${error ? errorBox(error) : ''}<div class="onboarding-actions">${step ? '<button type="button" class="auth-tab" data-onboarding-back>Quay lại</button>' : ''}<button type="button" class="auth-tab" data-onboarding-skip>Bỏ qua</button><button class="btn btn-primary btn-large">${step === 2 ? 'Hoàn tất' : 'Tiếp tục'}</button></div></form>`);
 }
@@ -116,11 +116,17 @@ function profileView(profile = {}, message = '') {
     <label class="field span-two"><span>Giới thiệu ngắn</span><textarea name="bio" maxlength="1000" placeholder="Chia sẻ về định hướng và điều bạn muốn theo đuổi">${escapeHtml(profile.bio || '')}</textarea></label>
     <label class="field span-two"><span>Vị trí mong muốn (mỗi dòng một vị trí)</span><textarea name="desiredRoles" placeholder="Frontend Developer&#10;Thực tập sinh UI/UX">${escapeHtml((profile.desiredRoles || []).join('\n'))}</textarea></label>
     <label class="field span-two"><span>Loại hình công việc (mỗi dòng một loại)</span><textarea name="jobTypes" placeholder="Thực tập&#10;Toàn thời gian">${escapeHtml((profile.jobTypes || []).join('\n'))}</textarea></label>
+    <label class="field"><span>Lương tối thiểu (VND/tháng)</span><input name="minimumSalary" type="number" min="0" step="500000" value="${escapeHtml(profile.minimumSalary || '')}" placeholder="8000000"></label>
+    <fieldset class="field"><legend>Giờ khả dụng</legend><label><input type="checkbox" name="availableWorkHours" value="morning" ${(profile.availableWorkHours || []).includes('morning') ? 'checked' : ''}> Sáng</label> <label><input type="checkbox" name="availableWorkHours" value="afternoon" ${(profile.availableWorkHours || []).includes('afternoon') ? 'checked' : ''}> Chiều</label></fieldset>
+    <fieldset class="field span-two"><legend>Hình thức có thể làm</legend>${['remote', 'hybrid', 'onsite'].map(mode => `<label><input type="checkbox" name="preferredWorkModes" value="${mode}" ${(profile.preferredWorkModes || []).includes(mode) ? 'checked' : ''}> ${{ remote: 'Remote', hybrid: 'Hybrid', onsite: 'Onsite' }[mode]}</label> `).join('')}</fieldset>
     </div></details><details class="profile-section"><summary>Năng lực và kinh nghiệm</summary><div class="profile-form-grid">
     <label class="field span-two"><span>Học vấn (mỗi dòng một chương trình)</span><textarea name="education" placeholder="Chương trình · Trường · Thời gian">${escapeHtml((profile.education || []).join('\n'))}</textarea></label>
     <label class="field"><span>Kinh nghiệm</span><textarea name="experiences" placeholder="Mỗi dòng một kinh nghiệm">${escapeHtml((profile.experiences || []).join('\n'))}</textarea></label>
     <label class="field"><span>Dự án</span><textarea name="projects" placeholder="Mỗi dòng một dự án">${escapeHtml((profile.projects || []).join('\n'))}</textarea></label>
     <label class="field span-two"><span>Ngoại ngữ</span><input name="languages" value="${escapeHtml((profile.languages || []).join(', '))}" placeholder="Tiếng Anh, Tiếng Nhật"></label>
+    <label class="field"><span>GitHub</span><input name="githubUrl" type="url" inputmode="url" value="${escapeHtml(profile.portfolioLinks?.github || '')}" placeholder="https://github.com/ten-ban"></label>
+    <label class="field"><span>Behance / Figma</span><input name="designUrl" type="url" inputmode="url" value="${escapeHtml(profile.portfolioLinks?.design || '')}" placeholder="https://www.behance.net/... hoặc https://www.figma.com/..."></label>
+    <label class="field span-two"><span>Dự án đã triển khai</span><input name="projectUrl" type="url" inputmode="url" value="${escapeHtml(profile.portfolioLinks?.project || '')}" placeholder="https://ten-du-an.com"></label>
     <div class="field span-two"><span>Kỹ năng</span><div class="tag-list" id="skill-list">${chips || '<small>Danh mục kỹ năng chưa có.</small>'}</div></div>
     </div></details><details class="profile-section"><summary>Quyền riêng tư</summary><div class="profile-form-grid">
     <label class="field span-two"><span>Quyền riêng tư hồ sơ</span><select name="visibility"><option value="private" ${profile.visibility === 'private' ? 'selected' : ''}>Ẩn hồ sơ</option><option value="invited" ${profile.visibility === 'invited' ? 'selected' : ''}>Chỉ nhà tuyển dụng đã mời</option><option value="public" ${profile.visibility === 'public' ? 'selected' : ''}>Công khai</option></select></label>
@@ -205,7 +211,10 @@ document.addEventListener('submit', async event => {
     event.preventDefault();
     const form = event.target;
     const step = Number(form.dataset.step);
-    const values = Object.fromEntries(new FormData(form));
+    const formData = new FormData(form);
+    const values = Object.fromEntries(formData);
+    values.availableWorkHours = formData.getAll('availableWorkHours');
+    values.preferredWorkModes = formData.getAll('preferredWorkModes');
     const profile = { ...currentUser.profile, ...values };
     if (values.desiredRoles) profile.desiredRoles = values.desiredRoles.split('\n').map(value => value.trim()).filter(Boolean);
     if (values.jobType) profile.jobTypes = [...new Set([...(profile.jobTypes || []), values.jobType])];
@@ -269,7 +278,12 @@ document.addEventListener('submit', async event => {
   if (event.target.id === 'profile-form') {
     event.preventDefault();
     const form = event.target;
-    const profile = Object.fromEntries(new FormData(form));
+    const formData = new FormData(form);
+    const profile = Object.fromEntries(formData);
+    profile.availableWorkHours = formData.getAll('availableWorkHours');
+    profile.preferredWorkModes = formData.getAll('preferredWorkModes');
+    profile.portfolioLinks = { github: profile.githubUrl, design: profile.designUrl, project: profile.projectUrl };
+    delete profile.githubUrl; delete profile.designUrl; delete profile.projectUrl;
     profile.skills = [...document.querySelectorAll('[data-skill].selected')].map(item => item.dataset.skill);
     profile.onboardingCompleted = Boolean(currentUser.profile?.onboardingCompleted);
     for (const key of ['desiredRoles', 'jobTypes', 'education', 'experiences', 'projects']) profile[key] = String(profile[key] || '').split('\n').map(value => value.trim()).filter(Boolean);

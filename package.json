@@ -13,5 +13,7 @@
     "test:sprint4": "node --test \"Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo/tests/sprint4.integration.test.js\"",
     "check": "node --check \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/server.js\" && node --check \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/app.js\" && node --check \"Sprint 1_ Tài khoản, Phân quyền & Hồ sơ Sinh viên/scripts/backup.js\" && node --check \"Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/api.js\" && node --check \"Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/employer.js\" && node --check \"Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/jobs.js\" && node --check \"Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/job.js\" && node --check \"Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/my-jobs.js\" && node --check \"Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/moderation.js\" && node --check \"Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding/api.js\" && node --check \"Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding/cv.js\" && node --check \"Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo/api.js\" && node --check \"Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo/apply.js\" && node --check \"Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo/applications.js\" && node --check \"Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo/ats.js\" && node --check \"Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo/notifications.js\" && node --check \"Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo/notification-bell.js\""
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

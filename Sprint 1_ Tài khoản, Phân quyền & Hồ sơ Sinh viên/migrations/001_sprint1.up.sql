@@ -20,6 +20,14 @@ CREATE TABLE sessions (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX sessions_user_expiry_idx ON sessions (user_id, expires_at);
+CREATE TABLE auth_throttle_state (
+  throttle_key text PRIMARY KEY,
+  failed_attempts integer NOT NULL DEFAULT 0 CHECK (failed_attempts >= 0),
+  locked_until timestamptz,
+  window_started_at timestamptz NOT NULL,
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX auth_throttle_state_expiry_idx ON auth_throttle_state (locked_until, updated_at);
 CREATE TABLE account_tokens (
   id uuid PRIMARY KEY,
   user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -102,27 +110,39 @@ CREATE TABLE student_languages (
 CREATE INDEX student_languages_owner_idx ON student_languages (student_id, position);
 CREATE TABLE skills (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  canonical_name text NOT NULL UNIQUE,
-  aliases jsonb NOT NULL DEFAULT '[]',
-  skill_group text NOT NULL
+  name text NOT NULL UNIQUE,
+  category text NOT NULL
 );
 CREATE TABLE student_skills (
   student_id uuid NOT NULL REFERENCES student_profiles(user_id) ON DELETE CASCADE,
   skill_id bigint NOT NULL REFERENCES skills(id) ON DELETE RESTRICT,
+  level text NOT NULL DEFAULT 'intermediate' CHECK (level IN ('beginner', 'intermediate', 'advanced', 'expert')),
+  verified boolean NOT NULL DEFAULT false,
   PRIMARY KEY (student_id, skill_id)
 );
-INSERT INTO skills (canonical_name, aliases, skill_group) VALUES
-  ('JavaScript', '["js", "ecmascript"]', 'Programming'),
-  ('TypeScript', '["ts"]', 'Programming'),
-  ('React', '["react.js", "reactjs"]', 'Frontend'),
-  ('Node.js', '["node", "nodejs"]', 'Backend'),
-  ('Python', '["py"]', 'Programming'),
-  ('Java', '[]', 'Programming'),
-  ('SQL', '["structured query language"]', 'Data'),
-  ('Figma', '[]', 'Design'),
-  ('Giao tiếp', '["communication", "kỹ năng giao tiếp"]', 'Soft skills'),
-  ('Phân tích dữ liệu', '["data analysis", "data analytics"]', 'Data'),
-  ('Git', '["git version control"]', 'Tools');
+CREATE INDEX student_skills_skill_student_idx ON student_skills (skill_id, student_id);
+INSERT INTO skills (name, category) VALUES
+  ('JavaScript', 'Programming'), ('TypeScript', 'Programming'), ('React', 'Frontend'),
+  ('Node.js', 'Backend'), ('Python', 'Programming'), ('Java', 'Programming'),
+  ('SQL', 'Data'), ('Figma', 'Design'), ('Giao tiếp', 'Soft skills'),
+  ('Phân tích dữ liệu', 'Data'), ('Git', 'Tools');
+CREATE TABLE student_deal_breakers (
+  student_id uuid PRIMARY KEY REFERENCES student_profiles(user_id) ON DELETE CASCADE,
+  minimum_salary bigint CHECK (minimum_salary IS NULL OR minimum_salary >= 0),
+  available_work_hours text[] NOT NULL DEFAULT '{}',
+  work_modes text[] NOT NULL DEFAULT '{}',
+  CHECK (available_work_hours <@ ARRAY['morning','afternoon']::text[]),
+  CHECK (work_modes <@ ARRAY['remote','hybrid','onsite']::text[])
+);
+CREATE TABLE student_portfolio_links (
+  id uuid PRIMARY KEY,
+  student_id uuid NOT NULL REFERENCES student_profiles(user_id) ON DELETE CASCADE,
+  link_type text NOT NULL CHECK (link_type IN ('github','design','project')),
+  url text NOT NULL CHECK (url ~* '^https?://[^[:space:]]+$'),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE(student_id, link_type)
+);
+CREATE INDEX student_portfolio_links_owner_idx ON student_portfolio_links (student_id);
 CREATE TABLE audit_events (
   id uuid PRIMARY KEY,
   actor_user_id uuid REFERENCES users(id) ON DELETE SET NULL,

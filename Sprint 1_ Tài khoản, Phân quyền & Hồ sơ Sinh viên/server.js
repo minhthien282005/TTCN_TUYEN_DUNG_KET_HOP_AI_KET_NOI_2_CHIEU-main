@@ -32,8 +32,9 @@ for (const account of db.users) {
   if (account.resetToken && !account.resetTokenHash) { account.resetTokenHash = crypto.createHmac('sha256', TOKEN_PEPPER).update(account.resetToken).digest('hex'); delete account.resetToken; dataUpgraded = true; }
   if (account.profile) for (const key of ['education', 'desiredRoles', 'jobTypes', 'experiences', 'projects', 'languages', 'skills', 'certifications', 'activities', 'externalLinks']) account.profile[key] ||= [];
 }
-const attempts = new Map();
-const requestWindows = new Map();
+db.securityState ||= { loginAttempts: {}, requestWindows: {} };
+db.securityState.loginAttempts ||= {};
+db.securityState.requestWindows ||= {};
 const categories = {
   industries: ['Công nghệ thông tin', 'Tài chính - Ngân hàng', 'Marketing', 'Thiết kế', 'Kinh doanh', 'Giáo dục', 'Kỹ thuật'],
   schools: ['Đại học Bách khoa Hà Nội', 'Đại học Công nghệ - ĐHQGHN', 'Đại học Kinh tế Quốc dân', 'Đại học Bách khoa TP.HCM', 'Đại học FPT', 'Khác'],
@@ -106,6 +107,11 @@ function readBody(req) {
   });
 }
 function cleanText(value, max = 500) { return String(value || '').trim().slice(0, max); }
+function validHttpUrl(value) {
+  if (!value) return true;
+  try { const parsed = new URL(value); return ['http:', 'https:'].includes(parsed.protocol) && Boolean(parsed.hostname) && !parsed.username && !parsed.password; }
+  catch { return false; }
+}
 function emailValid(value) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value); }
 function sessionCookie(token) { return `sid=${encodeURIComponent(token)}; HttpOnly; SameSite=Lax; Path=/; Max-Age=604800${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`; }
 function clearCookie() { return `sid=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`; }
@@ -113,9 +119,11 @@ function clearCookie() { return `sid=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0
 async function api(req, res, url) {
   if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
     const key = `${req.socket.remoteAddress}:${req.method}:${url.pathname}`;
-    const bucket = requestWindows.get(key) || { count: 0, resetAt: Date.now() + 60_000 };
+    const bucket = db.securityState.requestWindows[key] || { count: 0, resetAt: Date.now() + 60_000 };
     if (bucket.resetAt <= Date.now()) { bucket.count = 0; bucket.resetAt = Date.now() + 60_000; }
-    bucket.count += 1; requestWindows.set(key, bucket);
+    bucket.count += 1; db.securityState.requestWindows[key] = bucket;
+    for (const [storedKey, stored] of Object.entries(db.securityState.requestWindows)) if (stored.resetAt <= Date.now()) delete db.securityState.requestWindows[storedKey];
+    save();
     if (bucket.count > 120) return json(res, 429, { error: 'Bạn thao tác quá nhanh. Vui lòng thử lại sau.' });
   }
   const user = authUser(req);
@@ -202,15 +210,15 @@ async function api(req, res, url) {
     const body = await readBody(req);
     const email = cleanText(body.email, 254).toLowerCase();
     const key = `${req.socket.remoteAddress}:${email}`;
-    const entry = attempts.get(key) || { count: 0, until: 0 };
+    const entry = db.securityState.loginAttempts[key] || { count: 0, until: 0 };
     if (entry.until > Date.now()) { audit(null, 'account.login_locked'); save(); return json(res, 429, { error: 'Tài khoản tạm khóa do đăng nhập sai nhiều lần. Thử lại sau 15 phút.' }); }
     const account = db.users.find(u => u.email === email && !u.deletedAt);
     if (!account || !(await verifyPassword(String(body.password || ''), account.passwordHash))) {
       entry.count += 1;
       if (entry.count >= 5) { entry.count = 0; entry.until = Date.now() + 15 * 60_000; }
-      attempts.set(key, entry); audit(account?.id || null, 'account.login_failed'); save(); return json(res, 401, { error: 'Email hoặc mật khẩu chưa chính xác.' });
+      db.securityState.loginAttempts[key] = entry; audit(account?.id || null, 'account.login_failed'); save(); return json(res, 401, { error: 'Email hoặc mật khẩu chưa chính xác.' });
     }
-    attempts.delete(key);
+    delete db.securityState.loginAttempts[key];
     if (account.lockedAt) return json(res, 403, { error: 'Tài khoản đang bị khóa. Liên hệ quản trị viên để được hỗ trợ.' });
     if (!account.verified) return json(res, 403, { error: 'Hãy xác minh email trước khi đăng nhập.' });
     if (user && user.id !== account.id) sprint6Api.closeUserStreams(user.id);
@@ -286,11 +294,19 @@ async function api(req, res, url) {
     if (phone && !/^[+0-9() .-]{8,20}$/.test(phone)) return json(res, 400, { error: 'Số điện thoại chưa đúng định dạng.' });
     const gradYear = cleanText(profile.gradYear, 4);
     const gpa = cleanText(profile.gpa, 8);
+    const minimumSalaryText = cleanText(profile.minimumSalary, 12);
+    const minimumSalary = minimumSalaryText ? Number(minimumSalaryText) : null;
+    if (minimumSalaryText && (!Number.isSafeInteger(minimumSalary) || minimumSalary < 0 || minimumSalary > 1_000_000_000)) return json(res, 400, { error: 'Mức lương tối thiểu phải là số tiền VND hợp lệ.' });
+    const availableWorkHours = Array.isArray(profile.availableWorkHours) ? [...new Set(profile.availableWorkHours.filter(value => ['morning', 'afternoon'].includes(value)))] : [];
+    const preferredWorkModes = Array.isArray(profile.preferredWorkModes) ? [...new Set(profile.preferredWorkModes.filter(value => ['remote', 'hybrid', 'onsite'].includes(value)))] : [];
+    const portfolioLinks = { github: cleanText(profile.portfolioLinks?.github, 500), design: cleanText(profile.portfolioLinks?.design, 500), project: cleanText(profile.portfolioLinks?.project, 500) };
+    if (Object.entries(portfolioLinks).some(([key, value]) => value && !validHttpUrl(value))) return json(res, 400, { error: 'Link portfolio phải là URL HTTP/HTTPS hợp lệ.' });
     if (gradYear && (!/^\d{4}$/.test(gradYear) || Number(gradYear) < 1950 || Number(gradYear) > 2200)) return json(res, 400, { error: 'Năm tốt nghiệp cần nằm trong khoảng 1950–2200.' });
     if (gpa && !/^(?:[0-3](?:\.\d{1,2})?|4(?:\.0{1,2})?)$/.test(gpa)) return json(res, 400, { error: 'GPA cần nằm trong khoảng 0.00–4.00.' });
     user.profile = {
       fullName, phone, industry: cleanText(profile.industry, 120), school: cleanText(profile.school, 160), major: cleanText(profile.major, 120),
       gradYear, gpa, location: cleanText(profile.location, 100),
+      minimumSalary, availableWorkHours, preferredWorkModes, portfolioLinks,
       bio: cleanText(profile.bio, 1000), desiredRoles: boundedList(profile.desiredRoles, 10, 120), jobTypes: boundedList(profile.jobTypes, 5, 50),
       education: boundedList(profile.education), skills: boundedList(profile.skills, 40, 80).map(normalizeSkill), experiences: boundedList(profile.experiences), projects: boundedList(profile.projects), languages: boundedList(profile.languages, 10, 80),
       certifications: Array.isArray(user.profile?.certifications) ? user.profile.certifications : [],

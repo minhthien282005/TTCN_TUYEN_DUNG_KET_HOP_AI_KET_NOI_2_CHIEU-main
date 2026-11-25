@@ -1,5 +1,7 @@
 BEGIN;
 DROP TABLE IF EXISTS audit_events;
+DROP TABLE IF EXISTS student_portfolio_links;
+DROP TABLE IF EXISTS student_deal_breakers;
 DROP TABLE IF EXISTS student_skills;
 DROP TABLE IF EXISTS skills;
 DROP TABLE IF EXISTS student_languages;
@@ -12,5 +14,6 @@ DROP TABLE IF EXISTS reference_categories;
 DROP TABLE IF EXISTS consents;
 DROP TABLE IF EXISTS account_tokens;
 DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS auth_throttle_state;
 DROP TABLE IF EXISTS users;
 COMMIT;
