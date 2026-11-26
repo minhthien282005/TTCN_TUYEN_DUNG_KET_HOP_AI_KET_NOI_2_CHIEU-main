@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Trợ lý AI giúp sinh viên xây lộ trình kỹ năng và luyện phỏng vấn theo công việc mục tiêu.">
+  <title>AI Coach Sinh viên | Ketnoi</title>
+  <link rel="stylesheet" href="/home.css"><link rel="stylesheet" href="/site-nav.css"><link rel="stylesheet" href="/sprint8/coach.css">
+  <script defer src="/site-nav.js"></script><script defer src="/sprint8/coach.js"></script>
+</head>
+<body>
+  <header></header>
+  <main class="s8-wrap">
+    <section class="s8-hero"><div><span class="s8-eyebrow">SPRINT 8 · AI CAREER COACH</span><h1>Chủ động phát triển<br><em>sự nghiệp của bạn.</em></h1><p>Lộ trình kỹ năng sát với công việc mục tiêu, cùng buổi luyện phỏng vấn có góp ý theo câu trả lời của bạn.</p></div><div class="s8-hero-art" aria-hidden="true"><span>✦</span><b>AI<br>COACH</b><i>↗</i></div></section>
+    <div class="s8-notice" id="s8-notice" role="status" aria-live="polite"></div>
+    <nav class="s8-tabs" aria-label="Công cụ AI"><button class="active" data-tab="roadmap">Lộ trình kỹ năng</button><button data-tab="practice">Luyện phỏng vấn</button></nav>
+    <section class="s8-panel" id="roadmap-panel"><div class="s8-panel-head"><div><span class="s8-step">01 / KẾ HOẠCH CÁ NHÂN</span><h2>Lộ trình phát triển kỹ năng</h2><p>Ưu tiên khoảng trống kỹ năng so với công việc đang tuyển.</p></div></div><form id="roadmap-form" class="s8-form"><label>Công việc muốn hướng tới<select id="roadmap-job"><option value="">Theo định hướng nghề nghiệp của tôi</option></select></label><button class="s8-button" type="submit">Tạo lộ trình <span>→</span></button></form><div id="roadmap-result" class="s8-roadmap"></div></section>
+    <section class="s8-panel" id="practice-panel" hidden><div class="s8-panel-head"><div><span class="s8-step">02 / PHỎNG VẤN THỬ</span><h2>Luyện trả lời tự tin hơn</h2><p>Chọn công việc để nhận câu hỏi theo kỹ năng; bạn có thể luyện lại bất cứ lúc nào.</p></div></div><form id="practice-form" class="s8-form"><label>Công việc mục tiêu<select id="practice-job"><option value="">Phỏng vấn tổng quát</option></select></label><button class="s8-button" type="submit">Bắt đầu luyện tập <span>→</span></button></form><div id="practice-session"></div></section>
+    <section class="s8-panel s8-history"><div class="s8-panel-head"><div><span class="s8-step">HOẠT ĐỘNG GẦN ĐÂY</span><h2>Buổi luyện tập của bạn</h2></div></div><div id="practice-history" class="s8-history-list"></div></section>
+    <p class="s8-privacy">Góp ý tự động dựa trên cấu trúc câu trả lời. Mô hình AI bên ngoài chỉ được dùng khi bạn đã bật đồng ý AI ở trang Công cụ AI; hãy không nhập thông tin mật hoặc dữ liệu cá nhân nhạy cảm.</p>
+  </main>
+</body>
+</html>
