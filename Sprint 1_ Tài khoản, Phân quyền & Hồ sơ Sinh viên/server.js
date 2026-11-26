@@ -7,6 +7,7 @@ const sprint3Api = require('../Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & 
 const sprint4Api = require('../Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo/api');
 const sprint5Api = require('../Sprint 5_ Matching hai chiều, Giải thích & Hoàn thiện/api');
 const sprint6Api = require('../Sprint 6_ Lời mời, Mutual Match, Chat Realtime & Sourcing/api');
+const sprint7Api = require('../Sprint 7_ Phỏng vấn, Offer, ATS nâng cao, Thông báo & Cảnh báo/api');
 
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
@@ -141,6 +142,8 @@ async function api(req, res, url) {
   if (sprint5Response !== null) return;
   const sprint6Response = await sprint6Api.handleRequest(req, res, url, user, { db, save, audit });
   if (sprint6Response !== null) return;
+  const sprint7Response = await sprint7Api.handleRequest(req, res, url, user, { db, save, audit });
+  if (sprint7Response !== null) return;
   const sprint3Response = await sprint3Api.handleRequest(req, res, url, user, { db, save, audit });
   if (sprint3Response !== null) return;
   if (req.method === 'GET' && url.pathname === '/api/me') return json(res, 200, { user: user ? publicUser(user) : null });
@@ -327,6 +330,7 @@ async function api(req, res, url) {
     sprint4Api.deleteUserData(db, user);
     sprint5Api.deleteUserData(db, user);
     sprint6Api.deleteUserData(db, user);
+    sprint7Api.deleteUserData(db, user);
     db.sessions = db.sessions.filter(s => s.userId !== user.id); audit(user.id, 'account.delete'); save();
     return json(res, 200, { message: 'Tài khoản đã được xóa mềm.' }, { 'Set-Cookie': clearCookie() });
   }
@@ -377,8 +381,10 @@ const server = http.createServer(async (req, res) => {
     const isSprint5Asset = url.pathname.startsWith('/sprint5/') || sprint5Pages.includes(url.pathname);
     const isSprint6Asset = url.pathname.startsWith('/sprint6/') || url.pathname === '/network.html';
     const sprint6Root = path.resolve(__dirname, '..', 'Sprint 6_ Lời mời, Mutual Match, Chat Realtime & Sourcing');
-    const assetRoot = isSprintAsset ? __dirname : isSprint2Asset ? path.resolve(__dirname, '..', 'Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt') : isSprint3Asset ? path.resolve(__dirname, '..', 'Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding') : isSprint4Asset ? path.resolve(__dirname, '..', 'Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo') : isSprint5Asset ? path.resolve(__dirname, '..', 'Sprint 5_ Matching hai chiều, Giải thích & Hoàn thiện') : isSprint6Asset ? sprint6Root : PUBLIC;
-    const requested = isSprintAsset ? 'app.js' : isSprint2Asset ? (url.pathname.startsWith('/sprint2/') ? decodeURIComponent(url.pathname.slice('/sprint2/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint3Asset ? (url.pathname.startsWith('/sprint3/') ? decodeURIComponent(url.pathname.slice('/sprint3/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint4Asset ? (url.pathname.startsWith('/sprint4/') ? decodeURIComponent(url.pathname.slice('/sprint4/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint5Asset ? (url.pathname.startsWith('/sprint5/') ? decodeURIComponent(url.pathname.slice('/sprint5/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint6Asset ? (url.pathname.startsWith('/sprint6/') ? decodeURIComponent(url.pathname.slice('/sprint6/'.length)) : decodeURIComponent(url.pathname.slice(1))) : url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
+    const isSprint7Asset = url.pathname.startsWith('/sprint7/');
+    const sprint7Root = path.resolve(__dirname, '..', 'Sprint 7_ Phỏng vấn, Offer, ATS nâng cao, Thông báo & Cảnh báo');
+    const assetRoot = isSprintAsset ? __dirname : isSprint2Asset ? path.resolve(__dirname, '..', 'Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt') : isSprint3Asset ? path.resolve(__dirname, '..', 'Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding') : isSprint4Asset ? path.resolve(__dirname, '..', 'Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo') : isSprint5Asset ? path.resolve(__dirname, '..', 'Sprint 5_ Matching hai chiều, Giải thích & Hoàn thiện') : isSprint6Asset ? sprint6Root : isSprint7Asset ? sprint7Root : PUBLIC;
+    const requested = isSprintAsset ? 'app.js' : isSprint2Asset ? (url.pathname.startsWith('/sprint2/') ? decodeURIComponent(url.pathname.slice('/sprint2/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint3Asset ? (url.pathname.startsWith('/sprint3/') ? decodeURIComponent(url.pathname.slice('/sprint3/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint4Asset ? (url.pathname.startsWith('/sprint4/') ? decodeURIComponent(url.pathname.slice('/sprint4/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint5Asset ? (url.pathname.startsWith('/sprint5/') ? decodeURIComponent(url.pathname.slice('/sprint5/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint6Asset ? (url.pathname.startsWith('/sprint6/') ? decodeURIComponent(url.pathname.slice('/sprint6/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint7Asset ? decodeURIComponent(url.pathname.slice('/sprint7/'.length)) : url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
     const target = path.resolve(assetRoot, requested);
     if (!target.startsWith(`${assetRoot}${path.sep}`) && target !== path.join(PUBLIC, 'index.html')) return json(res, 403, { error: 'Forbidden.' });
     fs.readFile(target, (err, content) => {

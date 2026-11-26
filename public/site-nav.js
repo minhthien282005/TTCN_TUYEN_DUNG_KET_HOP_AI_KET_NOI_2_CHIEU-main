@@ -8,8 +8,8 @@
   function userIdentity(user) { return user ? `${user.id || user.email}:${user.role || ''}` : ''; }
   function allowedForRole(role, path) {
     const common = path === '/' || path === '/index.html' || path === '/jobs.html' || path.startsWith('/jobs/') || ['/matches.html', '/ai-tools.html', '/notifications.html'].includes(path);
-    if (role === 'student') return common || ['/apply.html', '/cv.html', '/applications.html', '/my-jobs.html', '/network.html'].includes(path);
-    if (role === 'employer') return common || ['/employer.html', '/employer-profile.html', '/ats.html', '/network.html'].includes(path);
+    if (role === 'student') return common || ['/apply.html', '/cv.html', '/applications.html', '/my-jobs.html', '/network.html', '/sprint7/interviews.html'].includes(path);
+    if (role === 'employer') return common || ['/employer.html', '/employer-profile.html', '/ats.html', '/network.html', '/sprint7/interviews.html'].includes(path);
     if (role === 'admin') return path === '/' || path === '/index.html' || path === '/moderation.html';
     return common;
   }
@@ -28,6 +28,7 @@
       ['/ai-tools.html', 'AI hỗ trợ'],
       ['/cv.html', 'CV & hồ sơ'],
       ['/applications.html', 'Ứng tuyển'],
+      ['/sprint7/interviews.html', 'Phỏng vấn & Offer'],
       ['/notifications.html', 'Thông báo'],
       ['/network.html', 'Kết nối & trò chuyện']
     ],
@@ -37,6 +38,7 @@
       ['/ai-tools.html', 'AI hỗ trợ'],
       ['/employer-profile.html', 'Hồ sơ doanh nghiệp'],
       ['/ats.html', 'Ứng viên'],
+      ['/sprint7/interviews.html', 'Phỏng vấn & Offer'],
       ['/notifications.html', 'Thông báo'],
       ['/network.html', 'Tìm ứng viên & trò chuyện']
     ],
@@ -51,6 +53,7 @@
     if (pathname === '/ai-tools.html') return '/ai-tools.html';
     if (pathname === '/cv.html') return '/cv.html';
     if (pathname === '/applications.html') return '/applications.html';
+    if (pathname === '/sprint7/interviews.html') return '/sprint7/interviews.html';
     if (pathname === '/notifications.html') return '/notifications.html';
     if (pathname === '/network.html') return '/network.html';
     if (pathname === '/employer-profile.html') return user?.role === 'employer' ? '/employer-profile.html' : '';
