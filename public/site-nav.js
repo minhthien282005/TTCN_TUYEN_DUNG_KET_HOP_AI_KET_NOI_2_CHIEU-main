@@ -18,30 +18,20 @@
   const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
   const routesByRole = {
     guest: [
-      ['/jobs.html', 'Tìm việc'],
-      ['/cv.html', 'CV & hồ sơ'],
+      { label: 'Việc làm', items: [['/jobs.html', 'Tìm việc'], ['/matches.html', 'Gợi ý phù hợp']] },
+      { label: 'CV & công cụ', items: [['/cv.html', 'CV & hồ sơ'], ['/ai-tools.html', 'AI hỗ trợ']] },
       ['/employer.html', 'Nhà tuyển dụng']
     ],
     student: [
-      ['/jobs.html', 'Tìm việc'],
-      ['/matches.html', 'Gợi ý phù hợp'],
-      ['/ai-tools.html', 'AI hỗ trợ'],
-      ['/sprint8/coach.html', 'AI Coach'],
-      ['/cv.html', 'CV & hồ sơ'],
-      ['/applications.html', 'Ứng tuyển'],
-      ['/sprint7/interviews.html', 'Phỏng vấn & Offer'],
-      ['/notifications.html', 'Thông báo'],
-      ['/network.html', 'Kết nối & trò chuyện']
+      { label: 'Việc làm', items: [['/jobs.html', 'Tìm việc'], ['/matches.html', 'Gợi ý phù hợp'], ['/applications.html', 'Hồ sơ đã ứng tuyển'], ['/sprint7/interviews.html', 'Phỏng vấn & offer']] },
+      { label: 'Hồ sơ & AI', items: [['/cv.html', 'CV & hồ sơ năng lực'], ['/sprint8/coach.html', 'AI Coach'], ['/ai-tools.html', 'Công cụ AI']] },
+      ['/network.html', 'Kết nối'],
+      ['/notifications.html', 'Thông báo']
     ],
     employer: [
-      ['/employer.html', 'Đăng tuyển'],
-      ['/matches.html', 'Ứng viên phù hợp'],
-      ['/ai-tools.html', 'AI hỗ trợ'],
-      ['/employer-profile.html', 'Hồ sơ doanh nghiệp'],
-      ['/ats.html', 'Ứng viên'],
-      ['/sprint7/interviews.html', 'Phỏng vấn & Offer'],
-      ['/notifications.html', 'Thông báo'],
-      ['/network.html', 'Tìm ứng viên & trò chuyện']
+      { label: 'Tuyển dụng', items: [['/employer.html', 'Đăng tuyển & quản lý tin'], ['/matches.html', 'Ứng viên phù hợp'], ['/ats.html', 'Quản lý ứng viên'], ['/sprint7/interviews.html', 'Phỏng vấn & offer']] },
+      { label: 'Doanh nghiệp', items: [['/employer-profile.html', 'Hồ sơ doanh nghiệp'], ['/network.html', 'Tìm ứng viên & kết nối'], ['/ai-tools.html', 'Công cụ AI']] },
+      ['/notifications.html', 'Thông báo']
     ],
     admin: [
       ['/moderation.html', 'Quản trị & kiểm duyệt']
@@ -71,7 +61,12 @@
     renderedIdentity = userIdentity(user);
     const links = routesByRole[user?.role] || routesByRole.guest;
     const selected = activeHref(user);
-    nav.innerHTML = links.map(([href, label]) => `<a${href === '/notifications.html' ? ' id="s4-notifications-link"' : ''} href="${href}"${href === selected ? ' aria-current="page"' : ''}>${label}</a>`).join('');
+    const linkMarkup = ([href, label]) => `<a${href === '/notifications.html' ? ' id="s4-notifications-link"' : ''} href="${href}"${href === selected ? ' aria-current="page"' : ''}>${escapeHtml(label)}</a>`;
+    nav.innerHTML = links.map((item, index) => {
+      if (Array.isArray(item)) return `<a class="nav-direct${item[0] === selected ? ' is-active' : ''}"${item[0] === '/notifications.html' ? ' id="s4-notifications-link"' : ''} href="${item[0]}"${item[0] === selected ? ' aria-current="page"' : ''}>${escapeHtml(item[1])}</a>`;
+      const active = item.items.some(([href]) => href === selected);
+      return `<div class="nav-group${active ? ' has-active' : ''}"><button class="nav-menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu-${index}"><span>${escapeHtml(item.label)}</span><svg aria-hidden="true" viewBox="0 0 12 12"><path d="m2.5 4.5 3.5 3 3.5-3"/></svg></button><div class="nav-dropdown" id="site-menu-${index}" aria-hidden="true" inert>${item.items.map(linkMarkup).join('')}</div></div>`;
+    }).join('');
 
     if (onHome) return; // Sprint 1 owns the homepage account controls.
     const actions = document.querySelector('#nav-actions');
@@ -117,6 +112,69 @@
         else window.location.reload();
       })
       .catch(() => window.location.reload());
+  });
+
+  function setDropdown(group, open) {
+    group.classList.toggle('is-open', open);
+    group.querySelector('.nav-menu-toggle')?.setAttribute('aria-expanded', String(open));
+    const menu = group.querySelector('.nav-dropdown');
+    if (menu) { menu.inert = !open; menu.setAttribute('aria-hidden', String(!open)); }
+  }
+  function closeDropdowns(except = null) {
+    document.querySelectorAll('.nav-group.is-open').forEach(group => {
+      if (group === except) return;
+      setDropdown(group, false);
+    });
+  }
+  function openDropdown(group) { closeDropdowns(group); setDropdown(group, true); }
+  function scheduleDropdownClose(group) {
+    window.setTimeout(() => {
+      const focused = group.contains(document.activeElement) && !document.activeElement.matches('.nav-menu-toggle');
+      if (group.matches(':hover') || focused) return;
+      setDropdown(group, false);
+    }, 140);
+  }
+  document.addEventListener('pointerover', event => {
+    if (event.pointerType !== 'mouse') return;
+    const group = event.target.closest('.nav-group');
+    if (group && !group.contains(event.relatedTarget)) openDropdown(group);
+  });
+  document.addEventListener('pointerout', event => {
+    if (event.pointerType !== 'mouse') return;
+    const group = event.target.closest('.nav-group');
+    if (group && !group.contains(event.relatedTarget)) scheduleDropdownClose(group);
+  });
+  document.addEventListener('focusin', event => {
+    const group = event.target.closest('.nav-group'); if (group) openDropdown(group);
+  });
+  document.addEventListener('focusout', event => {
+    const group = event.target.closest('.nav-group');
+    if (group && !group.contains(event.relatedTarget)) scheduleDropdownClose(group);
+  });
+  document.addEventListener('click', event => {
+    const toggle = event.target.closest('.nav-menu-toggle');
+    if (toggle) {
+      const group = toggle.closest('.nav-group'); const opening = !group.classList.contains('is-open') || (event.detail > 0 && group.matches(':hover'));
+      closeDropdowns(group);
+      setDropdown(group, opening);
+      if (opening && event.detail === 0) group.querySelector('.nav-dropdown a')?.focus();
+      return;
+    }
+    if (event.target.closest('.nav-dropdown a')) closeDropdowns();
+    else if (!event.target.closest('.nav-group')) closeDropdowns();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') {
+      const openGroup = document.querySelector('.nav-group.is-open'); closeDropdowns();
+      openGroup?.querySelector('.nav-menu-toggle')?.focus();
+      const nav = document.querySelector('#primary-nav'); const button = document.querySelector('#mobile-menu');
+      if (nav?.classList.contains('mobile-open')) { nav.classList.remove('mobile-open'); button?.setAttribute('aria-expanded', 'false'); }
+    }
+    if (event.key === 'ArrowDown' && event.target.matches('.nav-menu-toggle')) {
+      event.preventDefault(); const group = event.target.closest('.nav-group');
+      if (!group.classList.contains('is-open')) event.target.click();
+      group.querySelector('.nav-dropdown a')?.focus();
+    }
   });
 
   // The homepage account app handles its own mobile menu through delegated events.
