@@ -9,6 +9,7 @@ const sprint5Api = require('../Sprint 5_ Matching hai chiều, Giải thích & H
 const sprint6Api = require('../Sprint 6_ Lời mời, Mutual Match, Chat Realtime & Sourcing/api');
 const sprint7Api = require('../Sprint 7_ Phỏng vấn, Offer, ATS nâng cao, Thông báo & Cảnh báo/api');
 const sprint8Api = require('../Sprint 8_ AI hỗ trợ Sinh viên/api');
+const sprint9Api = require('../Sprint 9_ Quản trị, Kiểm duyệt tự động, An toàn & Tuân thủ dữ liệu/api');
 
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
@@ -135,7 +136,7 @@ async function api(req, res, url) {
     if (!Array.isArray(body.skills) || body.skills.length > 100) return json(res, 400, { error: 'skills cần là danh sách tối đa 100 phần tử.' });
     return json(res, 200, { skills: [...new Set(body.skills.map(normalizeSkill).filter(Boolean))] });
   }
-  const sprint2Response = await sprint2Api(req, res, url, user, { db, save, audit, tokenHash, sendMail, appBaseUrl: APP_BASE_URL, onJobChanged: job => sprint3Api.embedJob(db, job, save) });
+  const sprint2Response = await sprint2Api(req, res, url, user, { db, save, audit, tokenHash, sendMail, appBaseUrl: APP_BASE_URL, onJobChanged: job => { const changed = sprint9Api.assessJob(db, job); if (changed && job.moderationAssessment.humanReviewRequired) audit(user?.id || job.ownerId || null, 'sprint9.job.flagged', job.id); save(); return sprint3Api.embedJob(db, job, save); } });
   if (sprint2Response !== null) return;
   const sprint4Response = await sprint4Api.handleRequest(req, res, url, user, { db, save, audit, sendMail, dataDir: DATA_DIR });
   if (sprint4Response !== null) return;
@@ -147,6 +148,8 @@ async function api(req, res, url) {
   if (sprint7Response !== null) return;
   const sprint8Response = await sprint8Api.handleRequest(req, res, url, user, { db, save, audit });
   if (sprint8Response !== null) return;
+  const sprint9Response = sprint9Api.handleRequest(req, res, url, user, { db, save, audit });
+  if (sprint9Response !== null) return;
   const sprint3Response = await sprint3Api.handleRequest(req, res, url, user, { db, save, audit });
   if (sprint3Response !== null) return;
   if (req.method === 'GET' && url.pathname === '/api/me') return json(res, 200, { user: user ? publicUser(user) : null });
@@ -363,7 +366,7 @@ const server = http.createServer(async (req, res) => {
       if (!job || !company) return json(res, 404, { error: 'Không tìm thấy tin tuyển dụng.' });
       const structured = { '@context': 'https://schema.org', '@type': 'JobPosting', title: job.title, description: [job.description, job.requirements, job.benefits].filter(Boolean).join('\n\n'), datePosted: job.publishedAt, validThrough: job.expiresAt, employmentType: job.type === 'Toàn thời gian' ? 'FULL_TIME' : job.type === 'Bán thời gian' ? 'PART_TIME' : job.type === 'Thực tập' ? 'INTERN' : 'CONTRACTOR', hiringOrganization: { '@type': 'Organization', name: company.name, sameAs: company.website || undefined }, jobLocation: { '@type': 'Place', address: { '@type': 'PostalAddress', addressLocality: job.location, addressCountry: 'VN' } }, ...(job.workMode === 'Từ xa' ? { jobLocationType: 'TELECOMMUTE', applicantLocationRequirements: { '@type': 'Country', name: 'Vietnam' } } : {}), ...(job.salaryMin || job.salaryMax ? { baseSalary: { '@type': 'MonetaryAmount', currency: 'VND', value: { '@type': 'QuantitativeValue', minValue: job.salaryMin || undefined, maxValue: job.salaryMax || undefined, unitText: 'MONTH' } } } : {}) };
       const jsonLd = JSON.stringify(structured).replace(/</g, '\\u003c');
-      const html = `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(job.title)} — ${escapeHtml(company.name)} | Ketnoi</title><meta name="description" content="${escapeHtml(job.description.slice(0, 250))}"><link rel="canonical" href="${escapeHtml(`${APP_BASE_URL}${url.pathname}`)}"><link rel="stylesheet" href="/home.css"><link rel="stylesheet" href="/site-nav.css"><link rel="stylesheet" href="/sprint2/sprint2.css"><link rel="stylesheet" href="/sprint2/detail.css"><link rel="stylesheet" href="/app-theme.css"><link rel="stylesheet" href="/redesign.css?v=20261126-no-underline"><script src="/site-nav.js?v=20261126-smooth" defer></script><script type="application/ld+json">${jsonLd}</script><script src="/sprint2/job.js" defer></script></head><body><header class="s2-header"><a class="brand" href="/"><span class="brand-mark"><img src="/logo-mark.svg" alt=""></span><span class="brand-wordmark">KETNOI</span></a><nav><a href="/jobs.html">Tìm việc</a><a href="/">Trang chủ</a></nav></header><main class="s2-shell"><a class="s2-back-link" href="/jobs.html">← Quay lại danh sách việc làm</a><div id="job-detail" class="s2-detail-layout"><p class="s2-muted">${escapeHtml(job.title)} · ${escapeHtml(company.name)} · ${escapeHtml(job.location)}</p></div></main><footer class="s2-footer">Ketnoi · Kết nối nghề nghiệp hai chiều</footer></body></html>`;
+      const html = `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(job.title)} — ${escapeHtml(company.name)} | Ketnoi</title><meta name="description" content="${escapeHtml(job.description.slice(0, 250))}"><link rel="canonical" href="${escapeHtml(`${APP_BASE_URL}${url.pathname}`)}"><link rel="stylesheet" href="/home.css"><link rel="stylesheet" href="/site-nav.css"><link rel="stylesheet" href="/sprint2/sprint2.css"><link rel="stylesheet" href="/sprint2/detail.css"><link rel="stylesheet" href="/app-theme.css"><link rel="stylesheet" href="/redesign.css?v=20261126-no-underline"><script src="/site-nav.js?v=20261127-sprint9" defer></script><script type="application/ld+json">${jsonLd}</script><script src="/sprint2/job.js" defer></script></head><body><header class="s2-header"><a class="brand" href="/"><span class="brand-mark"><img src="/logo-mark.svg" alt=""></span><span class="brand-wordmark">KETNOI</span></a><nav><a href="/jobs.html">Tìm việc</a><a href="/">Trang chủ</a></nav></header><main class="s2-shell"><a class="s2-back-link" href="/jobs.html">← Quay lại danh sách việc làm</a><div id="job-detail" class="s2-detail-layout"><p class="s2-muted">${escapeHtml(job.title)} · ${escapeHtml(company.name)} · ${escapeHtml(job.location)}</p></div></main><footer class="s2-footer">Ketnoi · Kết nối nghề nghiệp hai chiều</footer></body></html>`;
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=60' }); res.end(req.method === 'HEAD' ? undefined : html); return;
     }
     if (url.pathname === '/sitemap.xml') {
@@ -389,8 +392,10 @@ const server = http.createServer(async (req, res) => {
     const sprint7Root = path.resolve(__dirname, '..', 'Sprint 7_ Phỏng vấn, Offer, ATS nâng cao, Thông báo & Cảnh báo');
     const isSprint8Asset = url.pathname.startsWith('/sprint8/');
     const sprint8Root = path.resolve(__dirname, '..', 'Sprint 8_ AI hỗ trợ Sinh viên');
-    const assetRoot = isSprintAsset ? __dirname : isSprint2Asset ? path.resolve(__dirname, '..', 'Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt') : isSprint3Asset ? path.resolve(__dirname, '..', 'Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding') : isSprint4Asset ? path.resolve(__dirname, '..', 'Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo') : isSprint5Asset ? path.resolve(__dirname, '..', 'Sprint 5_ Matching hai chiều, Giải thích & Hoàn thiện') : isSprint6Asset ? sprint6Root : isSprint7Asset ? sprint7Root : isSprint8Asset ? sprint8Root : PUBLIC;
-    const requested = isSprintAsset ? 'app.js' : isSprint2Asset ? (url.pathname.startsWith('/sprint2/') ? decodeURIComponent(url.pathname.slice('/sprint2/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint3Asset ? (url.pathname.startsWith('/sprint3/') ? decodeURIComponent(url.pathname.slice('/sprint3/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint4Asset ? (url.pathname.startsWith('/sprint4/') ? decodeURIComponent(url.pathname.slice('/sprint4/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint5Asset ? (url.pathname.startsWith('/sprint5/') ? decodeURIComponent(url.pathname.slice('/sprint5/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint6Asset ? (url.pathname.startsWith('/sprint6/') ? decodeURIComponent(url.pathname.slice('/sprint6/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint7Asset ? decodeURIComponent(url.pathname.slice('/sprint7/'.length)) : isSprint8Asset ? decodeURIComponent(url.pathname.slice('/sprint8/'.length)) : url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
+    const isSprint9Asset = url.pathname.startsWith('/sprint9/');
+    const sprint9Root = path.resolve(__dirname, '..', 'Sprint 9_ Quản trị, Kiểm duyệt tự động, An toàn & Tuân thủ dữ liệu');
+    const assetRoot = isSprintAsset ? __dirname : isSprint2Asset ? path.resolve(__dirname, '..', 'Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt') : isSprint3Asset ? path.resolve(__dirname, '..', 'Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding') : isSprint4Asset ? path.resolve(__dirname, '..', 'Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo') : isSprint5Asset ? path.resolve(__dirname, '..', 'Sprint 5_ Matching hai chiều, Giải thích & Hoàn thiện') : isSprint6Asset ? sprint6Root : isSprint7Asset ? sprint7Root : isSprint8Asset ? sprint8Root : isSprint9Asset ? sprint9Root : PUBLIC;
+    const requested = isSprintAsset ? 'app.js' : isSprint2Asset ? (url.pathname.startsWith('/sprint2/') ? decodeURIComponent(url.pathname.slice('/sprint2/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint3Asset ? (url.pathname.startsWith('/sprint3/') ? decodeURIComponent(url.pathname.slice('/sprint3/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint4Asset ? (url.pathname.startsWith('/sprint4/') ? decodeURIComponent(url.pathname.slice('/sprint4/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint5Asset ? (url.pathname.startsWith('/sprint5/') ? decodeURIComponent(url.pathname.slice('/sprint5/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint6Asset ? (url.pathname.startsWith('/sprint6/') ? decodeURIComponent(url.pathname.slice('/sprint6/'.length)) : decodeURIComponent(url.pathname.slice(1))) : isSprint7Asset ? decodeURIComponent(url.pathname.slice('/sprint7/'.length)) : isSprint8Asset ? decodeURIComponent(url.pathname.slice('/sprint8/'.length)) : isSprint9Asset ? decodeURIComponent(url.pathname.slice('/sprint9/'.length)) : url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
     const target = path.resolve(assetRoot, requested);
     if (!target.startsWith(`${assetRoot}${path.sep}`) && target !== path.join(PUBLIC, 'index.html')) return json(res, 403, { error: 'Forbidden.' });
     fs.readFile(target, (err, content) => {
@@ -409,6 +414,9 @@ const expirePublishedJobs = () => {
   if (changed) { audit(null, 'job.auto_expire', 'jobs'); save(); }
 };
 expirePublishedJobs();
+let assessmentUpdates = false;
+for (const job of db.jobs) assessmentUpdates = sprint9Api.assessJob(db, job) || assessmentUpdates;
+if (assessmentUpdates) { audit(null, 'sprint9.moderation.initial_scan', 'jobs'); save(); }
 setInterval(expirePublishedJobs, 60_000).unref();
 sprint3Api.startWorker({ db, save, audit });
 sprint4Api.startWorker({ db, save, sendMail });
