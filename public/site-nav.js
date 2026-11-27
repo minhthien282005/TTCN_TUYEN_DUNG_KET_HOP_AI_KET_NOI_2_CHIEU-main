@@ -8,9 +8,9 @@
   function userIdentity(user) { return user ? `${user.id || user.email}:${user.role || ''}` : ''; }
   function allowedForRole(role, path) {
     const common = path === '/' || path === '/index.html' || path === '/jobs.html' || path.startsWith('/jobs/') || ['/matches.html', '/ai-tools.html', '/notifications.html'].includes(path);
-    if (role === 'student') return common || ['/apply.html', '/cv.html', '/applications.html', '/my-jobs.html', '/network.html', '/sprint7/interviews.html', '/sprint8/coach.html', '/sprint9/privacy.html'].includes(path);
-    if (role === 'employer') return common || ['/employer.html', '/employer-profile.html', '/ats.html', '/network.html', '/sprint7/interviews.html', '/sprint9/privacy.html'].includes(path);
-    if (role === 'admin') return path === '/' || path === '/index.html' || ['/moderation.html', '/sprint9/admin.html', '/sprint9/privacy.html'].includes(path);
+    if (role === 'student') return common || ['/apply.html', '/cv.html', '/applications.html', '/my-jobs.html', '/network.html', '/sprint7/interviews.html', '/sprint8/coach.html', '/sprint9/privacy.html', '/sprint10/recommendations.html'].includes(path);
+    if (role === 'employer') return common || ['/employer.html', '/employer-profile.html', '/ats.html', '/network.html', '/sprint7/interviews.html', '/sprint9/privacy.html', '/sprint10/recommendations.html'].includes(path);
+    if (role === 'admin') return path === '/' || path === '/index.html' || ['/moderation.html', '/sprint9/admin.html', '/sprint9/privacy.html', '/sprint10/quality.html'].includes(path);
     return common;
   }
   function roleHome(role) { return ({ student: '/jobs.html', employer: '/employer.html', admin: '/moderation.html' })[role] || '/'; }
@@ -23,19 +23,20 @@
       ['/employer.html', 'Nhà tuyển dụng']
     ],
     student: [
-      { label: 'Việc làm', items: [['/jobs.html', 'Tìm việc'], ['/matches.html', 'Gợi ý phù hợp'], ['/applications.html', 'Hồ sơ đã ứng tuyển'], ['/sprint7/interviews.html', 'Phỏng vấn & offer']] },
+      { label: 'Việc làm', items: [['/jobs.html', 'Tìm việc'], ['/matches.html', 'Gợi ý phù hợp'], ['/sprint10/recommendations.html', 'Gợi ý AI cá nhân hóa'], ['/applications.html', 'Hồ sơ đã ứng tuyển'], ['/sprint7/interviews.html', 'Phỏng vấn & offer']] },
       { label: 'Hồ sơ & AI', items: [['/cv.html', 'CV & hồ sơ năng lực'], ['/sprint8/coach.html', 'AI Coach'], ['/ai-tools.html', 'Công cụ AI'], ['/sprint9/privacy.html', 'Quyền riêng tư & dữ liệu']] },
       ['/network.html', 'Kết nối'],
       ['/notifications.html', 'Thông báo']
     ],
     employer: [
-      { label: 'Tuyển dụng', items: [['/employer.html', 'Đăng tuyển & quản lý tin'], ['/matches.html', 'Ứng viên phù hợp'], ['/ats.html', 'Quản lý ứng viên'], ['/sprint7/interviews.html', 'Phỏng vấn & offer']] },
+      { label: 'Tuyển dụng', items: [['/employer.html', 'Đăng tuyển & quản lý tin'], ['/matches.html', 'Ứng viên phù hợp'], ['/sprint10/recommendations.html', 'Gợi ý AI cá nhân hóa'], ['/ats.html', 'Quản lý ứng viên'], ['/sprint7/interviews.html', 'Phỏng vấn & offer']] },
       { label: 'Doanh nghiệp', items: [['/employer-profile.html', 'Hồ sơ doanh nghiệp'], ['/network.html', 'Tìm ứng viên & kết nối'], ['/ai-tools.html', 'Công cụ AI'], ['/sprint9/privacy.html', 'Quyền riêng tư & dữ liệu']] },
       ['/notifications.html', 'Thông báo']
     ],
     admin: [
       ['/moderation.html', 'Quản trị & kiểm duyệt'],
       ['/sprint9/admin.html', 'An toàn & tuân thủ'],
+      ['/sprint10/quality.html', 'Theo dõi gợi ý AI'],
       ['/sprint9/privacy.html', 'Quyền riêng tư']
     ]
   };
@@ -56,6 +57,8 @@
     if (pathname === '/moderation.html') return '/moderation.html';
     if (pathname === '/sprint9/admin.html') return '/sprint9/admin.html';
     if (pathname === '/sprint9/privacy.html') return '/sprint9/privacy.html';
+    if (pathname === '/sprint10/recommendations.html') return '/sprint10/recommendations.html';
+    if (pathname === '/sprint10/quality.html') return '/sprint10/quality.html';
     return '';
   }
 

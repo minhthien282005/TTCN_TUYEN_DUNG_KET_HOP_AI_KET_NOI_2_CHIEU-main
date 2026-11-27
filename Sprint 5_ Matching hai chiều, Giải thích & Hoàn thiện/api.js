@@ -272,6 +272,8 @@ module.exports = {
     }
     return respond(res, 404, { error: 'Không tìm thấy endpoint Sprint 5.' });
   },
+  studentMatches,
+  employerMatches,
   syncNotifications,
   deleteUserData(db, user) {
     db.matchEvents ||= [];
