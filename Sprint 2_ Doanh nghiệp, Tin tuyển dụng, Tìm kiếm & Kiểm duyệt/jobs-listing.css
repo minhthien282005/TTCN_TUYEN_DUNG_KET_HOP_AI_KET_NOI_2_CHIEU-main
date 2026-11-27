@@ -1,0 +1,60 @@
+/* Job discovery page: quiet, readable palette with clear scanning and search hierarchy. */
+.s2-jobs-shell{max-width:1260px!important;padding-top:34px!important;padding-bottom:70px!important}
+.s2-jobs-shell>.s2-heading{margin:0 0 22px!important}
+.s2-jobs-shell>.s2-heading .s2-eyebrow{display:inline-flex;align-items:center;min-height:26px;padding:5px 11px!important;color:#175cd3!important;background:#eaf2ff!important;border:1px solid #d5e5fb!important;border-radius:99px!important;font-size:10px!important;letter-spacing:.1em!important}
+.s2-jobs-shell>.s2-heading h1{max-width:720px;margin:12px 0!important;color:#172b4d!important;font-size:clamp(36px,5vw,56px)!important;line-height:1.05!important;letter-spacing:-.05em!important}
+.s2-jobs-shell>.s2-heading h1 em{color:#087e76!important}
+.s2-jobs-shell>.s2-heading>p:last-child{max-width:650px;margin:12px 0 0;color:#667085!important;font-size:15px;line-height:1.65}
+.s2-jobs-shell #search-form{grid-template-columns:minmax(230px,2fr) repeat(4,minmax(125px,1fr))!important;align-items:end!important;gap:12px!important;margin:22px 0 18px!important;padding:19px!important;border:1px solid #e2e8f0!important;border-radius:16px!important;background:#fff!important;box-shadow:0 8px 24px rgba(23,43,77,.055)!important}
+.s2-jobs-shell #search-form>label{min-width:0;gap:7px;color:#475467!important;font-size:12px!important;font-weight:700!important}
+.s2-jobs-shell #search-form input,.s2-jobs-shell #search-form select{width:100%;height:44px;min-width:0;padding:0 12px!important;border:1px solid #dbe2ec!important;border-radius:9px!important;background:#fbfcfe!important;color:#172b4d!important;font-size:13px!important;transition:border-color .16s,box-shadow .16s,background .16s}
+.s2-jobs-shell #search-form input:focus,.s2-jobs-shell #search-form select:focus{border-color:#84afe9!important;background:#fff!important;box-shadow:0 0 0 3px #eaf2ff!important;outline:0!important}
+.s2-jobs-shell #search-form input::placeholder{color:#98a2b3}
+.s2-jobs-shell #search-form .s2-advanced{grid-column:1/5!important;align-self:center!important;margin:0!important;padding-top:11px!important;border-top:1px solid #edf0f4!important}
+.s2-jobs-shell #search-form .s2-advanced summary{display:inline-flex;align-items:center;gap:8px;color:#475467!important;font-size:12px!important;font-weight:700!important;cursor:pointer}
+.s2-jobs-shell #search-form .s2-advanced summary::marker{color:#175cd3}
+.s2-jobs-shell #search-form .s2-advanced-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px!important;padding-top:5px}
+.s2-jobs-shell #search-form>.s2-button{grid-column:5!important;grid-row:auto!important;justify-self:stretch!important;align-self:end!important;height:44px!important;min-height:44px;padding:0 15px!important;border-radius:9px!important;background:#175cd3!important;box-shadow:0 5px 12px rgba(23,92,211,.15)!important;font-size:13px!important}
+.s2-jobs-shell .s2-results-head{align-items:center;margin:28px 0 10px!important;padding:0 2px}
+.s2-jobs-shell .s2-results-head h2{color:#172b4d!important;font-size:18px!important;font-weight:750!important}
+.s2-jobs-shell #clear-search{min-height:36px;padding:8px 12px!important;border:1px solid #dce5f0!important;border-radius:8px!important;background:#fff!important;color:#475467!important;font-size:12px!important}
+.s2-jobs-shell #job-results.s2-public-jobs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:stretch;gap:16px!important;margin-top:12px!important}
+.s2-jobs-shell .s2-job-card{min-width:0;min-height:100%;padding:0!important;overflow:hidden;border:1px solid #e1e7ef!important;border-radius:15px!important;background:#fff!important;box-shadow:0 6px 20px rgba(23,43,77,.045)!important;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease!important}
+.s2-jobs-shell .s2-job-card:hover{transform:translateY(-3px)!important;border-color:#b8d0ef!important;box-shadow:0 15px 30px rgba(23,43,77,.095)!important}
+.s2-jobs-shell .s2-job-card-content{display:flex;flex:1;flex-direction:column;min-width:0;padding:19px 19px 17px}
+.s2-jobs-shell .s2-job-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.s2-jobs-shell .s2-job-verified{display:inline-flex;align-items:center;gap:5px;color:#087e76;font-size:10px;font-weight:750;white-space:nowrap}
+.s2-jobs-shell .s2-job-verified span{display:grid;width:16px;height:16px;place-items:center;border-radius:50%;background:#e7f6f1;font-size:10px}
+.s2-jobs-shell .s2-job-date{color:#8490a1;font-size:10px;white-space:nowrap}
+.s2-jobs-shell .s2-job-card h3{min-height:48px;margin:0 0 7px!important;color:#172b4d!important;font-size:17px!important;line-height:1.42!important;font-weight:740!important;overflow-wrap:anywhere}
+.s2-jobs-shell .s2-job-card h3 a{color:inherit!important;text-decoration:none!important}
+.s2-jobs-shell .s2-job-card h3 a:hover{color:#175cd3!important}
+.s2-jobs-shell .s2-job-company{display:block;min-height:20px;margin:0 0 9px!important;overflow:hidden;color:#667085!important;font-size:11px!important;text-overflow:ellipsis;white-space:nowrap}
+.s2-jobs-shell .s2-job-company span{padding:0 2px;color:#b0b8c4}
+.s2-jobs-shell .s2-job-card .s2-description{display:-webkit-box;min-height:60px;margin:0 0 12px!important;overflow:hidden;color:#58677b!important;font-size:12px!important;line-height:1.65!important;-webkit-box-orient:vertical;-webkit-line-clamp:3}
+.s2-jobs-shell .s2-job-tags{display:flex;flex-wrap:wrap;gap:6px;min-height:27px;margin:0 0 12px}
+.s2-jobs-shell .s2-job-chip{display:inline-flex;align-items:center;max-width:100%;min-height:24px;padding:4px 8px;border:1px solid #e7edf4;border-radius:99px;background:#f7f9fc;color:#526178;font-size:10px;line-height:1.2;overflow-wrap:anywhere}
+.s2-jobs-shell .s2-job-chip-primary{border-color:#d8e6f8;background:#eff5fd;color:#315b98;font-weight:700}
+.s2-jobs-shell .s2-job-card .s2-salary{display:flex;align-items:center;gap:7px;min-height:36px;margin:0 0 13px!important;padding:8px 10px;border:1px solid #dff0ea;border-radius:9px;background:#f2faf7;color:#087e76!important;font-size:12px!important;font-weight:750!important}
+.s2-jobs-shell .s2-job-card .s2-salary span{color:#0b9685}
+.s2-jobs-shell .s2-job-card .s2-actions{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;margin-top:auto;padding-top:12px;border-top:1px solid #edf0f4}
+.s2-jobs-shell .s2-job-card .s2-detail-link{display:inline-flex;align-items:center;justify-content:center;min-height:38px;padding:0 12px;border-radius:8px;background:#175cd3;color:#fff!important;font-size:12px;font-weight:700;text-decoration:none!important;transition:background .15s,transform .15s}
+.s2-jobs-shell .s2-job-card .s2-detail-link:hover{transform:translateY(-1px);background:#1249a8}
+.s2-jobs-shell .s2-job-card .s2-save-button{display:inline-flex;align-items:center;justify-content:center;gap:5px;min-height:38px;padding:0 10px!important;border:1px solid #dce5f0!important;border-radius:8px!important;background:#fff!important;color:#475467!important;font-size:11px!important;white-space:nowrap}
+.s2-jobs-shell .s2-job-card .s2-save-button:hover{border-color:#b8d0ef!important;background:#f5f8fd!important;color:#175cd3!important}
+.s2-jobs-shell .s2-job-card .s2-save-button.is-saved{border-color:#c9e6da!important;background:#edf8f2!important;color:#087e76!important}
+.s2-jobs-shell #job-results[aria-busy="true"]{opacity:.58}
+.s2-jobs-shell #job-results>.s2-muted{grid-column:1/-1;min-height:100px;display:grid;place-items:center;border:1px dashed #d7e0eb;border-radius:14px;background:#fff;color:#667085!important}
+.s2-jobs-shell .s2-job-empty{grid-column:1/-1;padding:38px 20px;border:1px dashed #cbd5e1;border-radius:15px;background:#fff;text-align:center}
+.s2-jobs-shell .s2-job-empty>span{display:grid;width:42px;height:42px;margin:0 auto 12px;place-items:center;border-radius:13px;background:#edf4ff;color:#175cd3;font-size:21px}
+.s2-jobs-shell .s2-job-empty h3{margin:0 0 5px;color:#172b4d;font-size:17px}
+.s2-jobs-shell .s2-job-empty p{margin:0;color:#667085;font-size:13px}
+.s2-jobs-shell .s2-pagination{gap:6px;margin:22px 0}
+.s2-jobs-shell .s2-pagination button{min-width:38px;min-height:38px;border-color:#dce5f0;border-radius:9px;color:#475467}
+.s2-jobs-shell .s2-pagination button[aria-current="page"]{border-color:#175cd3;background:#175cd3;color:#fff}
+.s2-jobs-shell #results-notice:empty{display:none}
+.s2-jobs-shell .s2-notice{border-radius:10px}
+@media(max-width:1000px){.s2-jobs-shell #job-results.s2-public-jobs{grid-template-columns:repeat(2,minmax(0,1fr))!important}.s2-jobs-shell #search-form{grid-template-columns:repeat(4,minmax(0,1fr))!important}.s2-jobs-shell #search-form>label:first-of-type{grid-column:span 2}.s2-jobs-shell #search-form .s2-advanced{grid-column:1/4!important}.s2-jobs-shell #search-form>.s2-button{grid-column:4!important}}
+@media(max-width:680px){.s2-jobs-shell{width:calc(100% - 28px)!important;padding-top:25px!important}.s2-jobs-shell #search-form{grid-template-columns:repeat(2,minmax(0,1fr))!important;padding:14px!important;gap:10px!important}.s2-jobs-shell #search-form>label:first-of-type{grid-column:1/-1}.s2-jobs-shell #search-form .s2-advanced{grid-column:1/-1!important}.s2-jobs-shell #search-form>.s2-button{grid-column:1/-1!important}.s2-jobs-shell #search-form .s2-advanced-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.s2-jobs-shell #job-results.s2-public-jobs{grid-template-columns:1fr!important;gap:12px!important}.s2-jobs-shell .s2-job-card-content{padding:16px}.s2-jobs-shell .s2-job-card h3{min-height:0}.s2-jobs-shell .s2-job-card .s2-description{min-height:0;-webkit-line-clamp:4}.s2-jobs-shell .s2-results-head{margin-top:22px}}
+@media(max-width:390px){.s2-jobs-shell #search-form .s2-advanced-grid{grid-template-columns:1fr}.s2-jobs-shell .s2-job-card .s2-actions{grid-template-columns:1fr 1fr}.s2-jobs-shell .s2-job-card .s2-save-button{padding-inline:7px!important}}
+@media(prefers-reduced-motion:reduce){.s2-jobs-shell .s2-job-card,.s2-jobs-shell .s2-job-card .s2-detail-link{transition:none!important}}

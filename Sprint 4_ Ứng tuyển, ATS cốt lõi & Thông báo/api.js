@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 const path = require('node:path');
+const { hasOpenPositions } = require('../Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/job-capacity');
 
 const DEFAULT_STAGES = [
   { key: 'submitted', label: 'Mới nộp' }, { key: 'viewed', label: 'Đã xem' },
@@ -21,7 +22,7 @@ const stagesFor = company => Array.isArray(company?.applicationStages) && compan
 const stageLabel = (company, key) => stagesFor(company).find(item => item.key === key)?.label || (key === 'rejected' ? 'Từ chối' : key === 'withdrawn' ? 'Đã rút' : key);
 const publicQuestions = questions => (questions || []).map(({ id, prompt, type, required, knockout, options }) => ({ id, prompt, type, required: Boolean(required), knockout: Boolean(knockout), options: options || [] }));
 const liveJob = (db, id) => {
-  const job = db.jobs.find(item => item.id === id && item.status === 'published' && (!item.expiresAt || Date.parse(item.expiresAt) > Date.now()));
+  const job = db.jobs.find(item => item.id === id && item.status === 'published' && hasOpenPositions(db, item) && (!item.expiresAt || Date.parse(item.expiresAt) > Date.now()));
   const company = job && db.companies.find(item => item.id === job.companyId && item.verificationStatus === 'verified');
   return job && company ? { job, company } : null;
 };
@@ -111,7 +112,7 @@ module.exports = {
     if (req.method === 'POST' && pathname === '/api/sprint4/student/applications') {
       if (!student) return respond(res, 403, { error: 'Chỉ sinh viên mới được nộp hồ sơ.' });
       const body = await read(60_000); if (!body) return;
-      const jobId = text(body.jobId, 80); const found = liveJob(db, jobId); if (!found) return respond(res, 404, { error: 'Tin không còn nhận hồ sơ.' });
+      const jobId = text(body.jobId, 80);
       const key = text(req.headers['idempotency-key'] || body.idempotencyKey, 120);
       if (key.length < 8) return respond(res, 400, { error: 'Thiếu Idempotency-Key hợp lệ để tránh nộp trùng.' });
       if (Array.isArray(body.answers) && body.answers.length > 10) return respond(res, 400, { error: 'Có tối đa 10 câu trả lời cho một tin.' });
@@ -120,6 +121,7 @@ module.exports = {
       const previousKey = db.applicationIdempotency.find(item => item.studentId === user.id && item.key === key);
       if (previousKey) return previousKey.requestHash === requestHash ? respond(res, 200, { application: publicApplication(db.applications.find(item => item.id === previousKey.applicationId), db), idempotentReplay: true }) : respond(res, 409, { error: 'Idempotency-Key đã được dùng cho dữ liệu khác.' });
       if (db.applications.some(item => item.jobId === jobId && item.studentId === user.id)) return respond(res, 409, { error: 'Bạn đã nộp hồ sơ cho tin này rồi.' });
+      const found = liveJob(db, jobId); if (!found) return respond(res, 404, { error: 'Tin không còn nhận hồ sơ.' });
       const cvId = text(body.cvId, 80); const cv = db.resumes.find(item => item.id === cvId && item.userId === user.id && item.scanStatus === 'clean' && ['review', 'confirmed'].includes(item.status));
       if (!cv) return respond(res, 400, { error: 'Chọn CV đã được quét và xử lý thành công trước khi nộp.' });
       const coverLetter = text(body.coverLetter, 3000);

@@ -8,8 +8,10 @@ const send = (res, status, payload, headers = {}) => {
 };
 const normalize = value => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const safeFields = (item, fields) => Object.fromEntries(fields.filter(key => item?.[key] !== undefined).map(key => [key, item[key]]));
+const ACTIVE_JOB_STATES = new Set(['pending_review', 'published', 'needs_changes']);
+const duplicateKey = job => `${job.companyId || ''}\u0000${normalize(job.title)}`;
 
-function assessJob(db, job) {
+function assessJob(db, job, duplicateCounts = null) {
   const content = normalize([job.title, job.description, job.requirements, job.benefits, job.recruitmentProcess].join(' '));
   const sourceHash = crypto.createHash('sha256').update(content).digest('hex');
   const reasons = [];
@@ -23,13 +25,24 @@ function assessJob(db, job) {
   if (/\b(viec nhe luong cao|cam ket thu nhap|thu nhap khong gioi han)\b/.test(content)) {
     score = Math.max(score, 50); reasons.push('Cụm từ thu nhập cam kết cần được kiểm tra thủ công.');
   }
-  const duplicate = (db.jobs || []).some(other => other.id !== job.id && other.companyId === job.companyId && normalize(other.title) === normalize(job.title) && ['pending_review', 'published', 'needs_changes'].includes(other.status));
+  const duplicate = duplicateCounts ? (duplicateCounts.get(duplicateKey(job)) || 0) - (ACTIVE_JOB_STATES.has(job.status) ? 1 : 0) > 0 : (db.jobs || []).some(other => other.id !== job.id && other.companyId === job.companyId && normalize(other.title) === normalize(job.title) && ACTIVE_JOB_STATES.has(other.status));
   if (duplicate) { score = Math.max(score, 55); reasons.push('Doanh nghiệp có tin trùng tiêu đề đang hoạt động.'); }
 
   const level = score >= 70 ? 'high' : score >= 40 ? 'review' : 'low';
   const prior = job.moderationAssessment;
   const changed = !prior || prior.sourceHash !== sourceHash || prior.score !== score || prior.level !== level || JSON.stringify(prior.reasons) !== JSON.stringify(reasons);
   if (changed) job.moderationAssessment = { score, level, reasons, engine: 'rules-v1', sourceHash, assessedAt: new Date().toISOString(), humanReviewRequired: score >= 40 };
+  return changed;
+}
+
+function assessJobs(db, jobs = db.jobs || []) {
+  const duplicateCounts = new Map();
+  for (const job of db.jobs || []) if (ACTIVE_JOB_STATES.has(job.status)) {
+    const key = duplicateKey(job);
+    duplicateCounts.set(key, (duplicateCounts.get(key) || 0) + 1);
+  }
+  let changed = false;
+  for (const job of jobs) changed = assessJob(db, job, duplicateCounts) || changed;
   return changed;
 }
 
@@ -66,6 +79,7 @@ function buildExport(db, user) {
 
 module.exports = {
   assessJob,
+  assessJobs,
   handleRequest(req, res, url, user, { db, save, audit }) {
     if (!url.pathname.startsWith('/api/sprint9/')) return null;
     if (!user) return send(res, 401, { error: 'Vui lòng đăng nhập để tiếp tục.' });
@@ -85,8 +99,7 @@ module.exports = {
 
     if (req.method === 'GET' && url.pathname === '/api/sprint9/admin/overview') {
       if (user.role !== 'admin') return send(res, 403, { error: 'Chỉ admin mới được xem trung tâm an toàn.' });
-      let changed = false;
-      for (const job of db.jobs || []) changed = assessJob(db, job) || changed;
+      const changed = assessJobs(db);
       if (changed) { audit?.(user.id, 'sprint9.moderation.assessment_refresh', 'jobs'); save(); }
       const allFlaggedJobs = (db.jobs || []).filter(job => job.moderationAssessment?.humanReviewRequired).sort((a, b) => b.moderationAssessment.score - a.moderationAssessment.score);
       const flaggedJobs = allFlaggedJobs.slice(0, 50).map(job => ({

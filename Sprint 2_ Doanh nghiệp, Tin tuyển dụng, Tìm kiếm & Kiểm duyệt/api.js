@@ -1,4 +1,5 @@
 const crypto = require('node:crypto');
+const { activeApplicationCounts, hasOpenPositions } = require('./job-capacity');
 const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 const path = require('node:path');
@@ -79,7 +80,8 @@ module.exports = async function sprint2Api(req, res, url, user, { db, save, audi
     const postedWithin = Math.max(0, Math.min(365, Number(url.searchParams.get('postedWithin')) || 0));
     const page = Math.max(1, Math.min(10000, Number(url.searchParams.get('page')) || 1));
     const pageSize = Math.max(1, Math.min(30, Number(url.searchParams.get('pageSize')) || 10));
-    let jobs = db.jobs.filter(job => job.status === 'published' && companiesById.get(job.companyId)?.verificationStatus === 'verified' && (!job.expiresAt || Date.parse(job.expiresAt) > Date.now()));
+    const applicationCounts = activeApplicationCounts(db);
+    let jobs = db.jobs.filter(job => job.status === 'published' && hasOpenPositions(db, job, applicationCounts) && companiesById.get(job.companyId)?.verificationStatus === 'verified' && (!job.expiresAt || Date.parse(job.expiresAt) > Date.now()));
     const blocked = user?.role === 'student' ? new Set(user.blockedCompanyIds || []) : new Set();
     const tokens = q.split(' ').filter(Boolean);
     jobs = jobs.filter(job => {
@@ -105,7 +107,7 @@ module.exports = async function sprint2Api(req, res, url, user, { db, save, audi
   }
   const detail = pathname.match(/^\/api\/jobs\/([\w-]+)$/);
   if (req.method === 'GET' && detail) {
-    const job = db.jobs.find(item => item.id === detail[1] && item.status === 'published' && db.companies.some(company => company.id === item.companyId && company.verificationStatus === 'verified') && (!item.expiresAt || Date.parse(item.expiresAt) > Date.now()) && !(user?.role === 'student' && (user.blockedCompanyIds || []).includes(item.companyId)));
+    const job = db.jobs.find(item => item.id === detail[1] && item.status === 'published' && hasOpenPositions(db, item) && db.companies.some(company => company.id === item.companyId && company.verificationStatus === 'verified') && (!item.expiresAt || Date.parse(item.expiresAt) > Date.now()) && !(user?.role === 'student' && (user.blockedCompanyIds || []).includes(item.companyId)));
     if (!job) return respond(res, 404, { error: 'Không tìm thấy tin tuyển dụng.' });
     if (user?.role === 'student') {
       const current = db.jobViews.filter(item => item.userId === user.id && item.jobId !== job.id);

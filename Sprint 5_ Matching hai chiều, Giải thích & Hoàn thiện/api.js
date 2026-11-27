@@ -1,12 +1,13 @@
 'use strict';
 
 const crypto = require('node:crypto');
+const { activeApplicationCounts, hasOpenPositions } = require('../Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/job-capacity');
 
 const text = (value, limit = 600) => String(value ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, limit);
 const norm = value => text(value, 3000).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').toLowerCase().replace(/[^a-z0-9+#.]+/g, ' ').trim();
 const respond = (res, status, value) => { if (res.writableEnded) return; res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(value)); };
 const companyFor = (db, user) => db.companies.find(company => company.ownerId === user.id);
-const liveJobs = db => (db.jobs || []).filter(job => job.status === 'published' && (!job.expiresAt || Date.parse(job.expiresAt) > Date.now())).filter(job => db.companies.some(company => company.id === job.companyId && company.verificationStatus === 'verified'));
+const liveJobs = db => { const counts = activeApplicationCounts(db); return (db.jobs || []).filter(job => job.status === 'published' && hasOpenPositions(db, job, counts) && (!job.expiresAt || Date.parse(job.expiresAt) > Date.now())).filter(job => db.companies.some(company => company.id === job.companyId && company.verificationStatus === 'verified')); };
 const cvData = (db, userId) => (db.resumes || []).filter(cv => cv.userId === userId && cv.scanStatus === 'clean' && ['review', 'confirmed'].includes(cv.status)).map(cv => cv.parseResult?.fields?.skills?.value || []).flat();
 const values = value => Array.isArray(value) ? value.map(item => typeof item === 'string' ? item : item?.skill || item?.title || item?.name || '').filter(Boolean) : [];
 const setOf = value => new Set(values(value).map(norm).filter(Boolean));

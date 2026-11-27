@@ -39,11 +39,12 @@ async function login(user) {
   return result.cookie;
 }
 async function waitForServer() {
-  for (let attempt = 0; attempt < 100; attempt++) {
+  for (let attempt = 0; attempt < 300; attempt++) {
+    if (child.exitCode !== null) throw new Error(`Sprint 2 test server exited with code ${child.exitCode}.`);
     try { const response = await fetch(`${baseUrl}/api/me`); if (response.ok) return; } catch { /* Server is still starting. */ }
     await new Promise(resolve => setTimeout(resolve, 100));
   }
-  throw new Error('Sprint 2 test server did not start.');
+  throw new Error('Sprint 2 test server did not start within 30 seconds.');
 }
 
 test('Sprint 2 P0 flows and search p95 at 10,000 jobs', { timeout: 120_000 }, async t => {

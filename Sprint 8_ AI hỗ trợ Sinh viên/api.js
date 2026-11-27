@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('node:crypto');
+const { activeApplicationCounts, hasOpenPositions } = require('../Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/job-capacity');
 const clean = (value, max = 500) => String(value ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, max);
 const norm = value => clean(value, 1000).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9+#.]+/g, ' ').trim();
 const send = (res, status, body) => { if (!res.writableEnded) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(body)); } };
@@ -13,7 +14,8 @@ const allStudentSkills = (db, user) => [...new Set([...skillsOf(user.profile), .
 const studentOnly = (res, user) => user ? (user.role === 'student' ? true : (send(res, 403, { error: 'Trợ lý Sprint 8 dành cho tài khoản sinh viên.' }), false)) : (send(res, 401, { error: 'Đăng nhập bằng tài khoản sinh viên để tiếp tục.' }), false);
 
 function targetJobs(db, user) {
-  return (db.jobs || []).filter(job => job.status === 'published' && (!job.expiresAt || Date.parse(job.expiresAt) > Date.now()) && (db.companies || []).some(company => company.id === job.companyId && company.verificationStatus === 'verified'))
+  const applicationCounts = activeApplicationCounts(db);
+  return (db.jobs || []).filter(job => job.status === 'published' && hasOpenPositions(db, job, applicationCounts) && (!job.expiresAt || Date.parse(job.expiresAt) > Date.now()) && (db.companies || []).some(company => company.id === job.companyId && company.verificationStatus === 'verified'))
     .map(job => {
       const required = (job.skillCriteria || job.skills || []).map(item => typeof item === 'string' ? item : item.skill || item.name || '').filter(Boolean);
       const known = new Set(allStudentSkills(db, user).map(norm));

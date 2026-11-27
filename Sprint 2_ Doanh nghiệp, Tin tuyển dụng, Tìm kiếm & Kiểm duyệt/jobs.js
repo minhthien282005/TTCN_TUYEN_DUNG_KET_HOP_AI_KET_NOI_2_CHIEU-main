@@ -39,6 +39,19 @@ function setBusy(busy) {
   if (busy) $('#results-notice').textContent = 'Đang cập nhật kết quả…';
 }
 
+function renderJobCard(job) {
+  const skills = (job.skills || []).slice(0, 4).map(item => {
+    const label = typeof item === 'string' ? item : item.skill || item.name || '';
+    return label ? `<span class="s2-job-chip">${escapeHtml(label)}</span>` : '';
+  }).filter(Boolean).join('');
+  const publishedAt = job.publishedAt && Number.isFinite(Date.parse(job.publishedAt)) ? new Date(job.publishedAt) : null;
+  const salary = job.salaryMin || job.salaryMax
+    ? `${job.salaryMin ? Number(job.salaryMin).toLocaleString('vi-VN') : 'Thỏa thuận'} – ${job.salaryMax ? Number(job.salaryMax).toLocaleString('vi-VN') : 'Thỏa thuận'} VNĐ/tháng`
+    : 'Mức lương thỏa thuận';
+  const href = `/jobs/${slugify(job.title)}--${encodeURIComponent(job.id)}`;
+  return `<article class="s2-public-card s2-job-card"><div class="s2-job-card-content"><div class="s2-job-card-top"><span class="s2-job-verified"><span aria-hidden="true">✓</span> Tin đã xác minh</span><time class="s2-job-date" datetime="${publishedAt ? publishedAt.toISOString() : ''}">${publishedAt ? `Đăng ${publishedAt.toLocaleDateString('vi-VN')}` : 'Cơ hội mới'}</time></div><h3><a href="${escapeHtml(href)}">${escapeHtml(job.title)}</a></h3><p class="s2-meta s2-job-company">${escapeHtml(job.company)} <span aria-hidden="true">·</span> ${escapeHtml(job.industry)} <span aria-hidden="true">·</span> ${escapeHtml(job.location)}</p><p class="s2-description">${escapeHtml(job.description.slice(0, 260))}${job.description.length > 260 ? '…' : ''}</p><div class="s2-job-tags"><span class="s2-job-chip s2-job-chip-primary">${escapeHtml(job.type || 'Linh hoạt')}</span><span class="s2-job-chip">${escapeHtml(job.workMode || job.location || 'Linh hoạt')}</span>${skills}</div><p class="s2-salary"><span aria-hidden="true">↗</span> ${escapeHtml(salary)}</p><div class="s2-actions"><a class="s2-detail-link" href="${escapeHtml(href)}">Xem chi tiết <span aria-hidden="true">↗</span></a><button class="s2-button s2-secondary s2-save-button" type="button" data-save="${escapeHtml(job.id)}">Lưu tin <span aria-hidden="true">♡</span></button></div></div></article>`;
+}
+
 async function loadJobs({ historyMode = 'replace' } = {}) {
   const requestId = ++activeRequest;
   const params = makeSearchParams();
@@ -52,7 +65,7 @@ async function loadJobs({ historyMode = 'replace' } = {}) {
     pages = result.pages;
     if (page > pages && pages > 0) { page = pages; return loadJobs({ historyMode: 'replace' }); }
     $('#result-count').textContent = `${result.total} việc làm phù hợp`;
-    $('#job-results').innerHTML = result.jobs.length ? result.jobs.map(job => `<article class="s2-public-card"><div><h3>${escapeHtml(job.title)}</h3><p class="s2-meta">${escapeHtml(job.company)} · ${escapeHtml(job.industry)} · ${escapeHtml(job.location)}</p><p class="s2-description">${escapeHtml(job.description.slice(0, 360))}${job.description.length > 360 ? '…' : ''}</p><p>${escapeHtml(job.type)} · ${escapeHtml(job.workMode)}${job.skills.length ? ` · ${job.skills.map(item => `${escapeHtml(item.skill || item)}${item.importance === 'required' ? ' *' : ''}`).join(' · ')}` : ''}</p>${job.salaryMin || job.salaryMax ? `<p class="s2-salary">${job.salaryMin ? Number(job.salaryMin).toLocaleString('vi-VN') : 'Thỏa thuận'} – ${job.salaryMax ? Number(job.salaryMax).toLocaleString('vi-VN') : 'Thỏa thuận'} VNĐ/tháng</p>` : ''}<div class="s2-actions"><a class="s2-detail-link" href="/jobs/${slugify(job.title)}--${encodeURIComponent(job.id)}">Xem chi tiết <span aria-hidden="true">↗</span></a><button class="s2-button s2-secondary" type="button" data-save="${escapeHtml(job.id)}">Lưu tin ♡</button></div></div><span class="s2-meta">${job.publishedAt ? new Date(job.publishedAt).toLocaleDateString('vi-VN') : ''}</span></article>`).join('') : '<div class="s2-panel"><p class="s2-muted">Chưa có tin tuyển dụng phù hợp. Hãy xóa bộ lọc hoặc quay lại sau.</p></div>';
+    $('#job-results').innerHTML = result.jobs.length ? result.jobs.map(renderJobCard).join('') : '<div class="s2-job-empty"><span aria-hidden="true">⌕</span><h3>Chưa có tin phù hợp</h3><p>Thử thay đổi bộ lọc hoặc xóa điều kiện tìm kiếm để xem thêm cơ hội.</p></div>';
     $('#pagination').innerHTML = pages > 1 ? Array.from({ length: pages }, (_, index) => index + 1).map(value => `<button type="button" data-page="${value}" ${value === page ? 'aria-current="page"' : ''}>${value}</button>`).join('') : '';
     $('#results-notice').textContent = '';
   } catch (error) {

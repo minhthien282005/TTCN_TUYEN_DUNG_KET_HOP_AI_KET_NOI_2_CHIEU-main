@@ -62,6 +62,8 @@ test('application, ATS stages, screening, optimistic locking, CV privacy and not
   const key = crypto.randomUUID();
   const submitted = await call('/api/sprint4/student/applications', { method: 'POST', cookie: studentCookie, headers: { 'Idempotency-Key': key }, body });
   assert.equal(submitted.status, 201); assert.equal(submitted.data.application.status, 'submitted'); assert.equal(submitted.data.application.score, 100);
+  assert.equal((await call('/api/jobs')).data.jobs.some(item => item.id === jobId), false);
+  assert.equal((await call(`/api/sprint4/jobs/${jobId}/apply-data`, { cookie: secondStudentCookie })).status, 404);
   const replay = await call('/api/sprint4/student/applications', { method: 'POST', cookie: studentCookie, headers: { 'Idempotency-Key': key }, body });
   assert.equal(replay.status, 200); assert.equal(replay.data.idempotentReplay, true); assert.equal(replay.data.application.id, submitted.data.application.id);
   assert.equal((await call('/api/sprint4/student/applications', { method: 'POST', cookie: studentCookie, headers: { 'Idempotency-Key': key }, body: { ...body, coverLetter: 'Changed request under the same key.' } })).status, 409);
@@ -81,6 +83,7 @@ test('application, ATS stages, screening, optimistic locking, CV privacy and not
   assert.equal(interview.status, 200); assert.equal(interview.data.application.stageLog.length, 4);
   const rejected = await call(`/api/sprint4/employer/applications/${submitted.data.application.id}/stage`, { method: 'PATCH', cookie: employerCookie, body: { status: 'rejected', reason: 'skills', expectedVersion: interview.data.application.version } });
   assert.equal(rejected.status, 200); assert.match(rejected.data.application.rejectionNote, /kỹ năng/i);
+  assert.equal((await call('/api/jobs')).data.jobs.some(item => item.id === jobId), true);
   const cv = await call(`/api/sprint4/employer/applications/${submitted.data.application.id}/cv`, { cookie: employerCookie }); assert.equal(cv.status, 200); assert.match(cv.data.toString(), /^%PDF/);
   assert.equal((await call(`/api/sprint4/employer/applications/${submitted.data.application.id}/cv`, { cookie: otherEmployerCookie })).status, 404);
 

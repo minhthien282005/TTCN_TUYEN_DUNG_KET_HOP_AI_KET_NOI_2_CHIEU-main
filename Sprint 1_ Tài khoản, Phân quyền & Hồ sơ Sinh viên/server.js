@@ -2,6 +2,21 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const ROOT = path.resolve(__dirname, '..');
+
+// Load local secrets before importing sprint modules; deployment env vars take precedence.
+const envFile = path.join(ROOT, '.env');
+if (fs.existsSync(envFile)) {
+  for (const line of fs.readFileSync(envFile, 'utf8').split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$/);
+    if (!match || match[1] in process.env) continue;
+    let value = match[2];
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) value = value.slice(1, -1);
+    process.env[match[1]] = value;
+  }
+}
+
+const { hasOpenPositions } = require('../Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/job-capacity');
 const sprint2Api = require('../Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/api');
 const sprint3Api = require('../Sprint 3_ Pipeline CV, Chuẩn hóa kỹ năng & Vector Embedding/api');
 const sprint4Api = require('../Sprint 4_ Ứng tuyển, ATS cốt lõi & Thông báo/api');
@@ -12,7 +27,6 @@ const sprint8Api = require('../Sprint 8_ AI hỗ trợ Sinh viên/api');
 const sprint9Api = require('../Sprint 9_ Quản trị, Kiểm duyệt tự động, An toàn & Tuân thủ dữ liệu/api');
 const sprint10Api = require('../Sprint 10_ AI nâng cao & Học máy tối ưu/api');
 
-const ROOT = path.resolve(__dirname, '..');
 const PUBLIC = path.join(ROOT, 'public');
 const DATA_DIR = process.env.DATA_DIR || path.join(ROOT, 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
@@ -365,7 +379,7 @@ const server = http.createServer(async (req, res) => {
     const escapeHtml = value => String(value || '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
     const seoJob = url.pathname.match(/^\/jobs\/[^/]+--([\da-f-]{36})$/i);
     if (seoJob) {
-      const job = db.jobs.find(item => item.id === seoJob[1] && item.status === 'published' && (!item.expiresAt || Date.parse(item.expiresAt) > Date.now()));
+      const job = db.jobs.find(item => item.id === seoJob[1] && item.status === 'published' && hasOpenPositions(db, item) && (!item.expiresAt || Date.parse(item.expiresAt) > Date.now()));
       const company = job && db.companies.find(item => item.id === job.companyId && item.verificationStatus === 'verified');
       if (!job || !company) return json(res, 404, { error: 'Không tìm thấy tin tuyển dụng.' });
       const structured = { '@context': 'https://schema.org', '@type': 'JobPosting', title: job.title, description: [job.description, job.requirements, job.benefits].filter(Boolean).join('\n\n'), datePosted: job.publishedAt, validThrough: job.expiresAt, employmentType: job.type === 'Toàn thời gian' ? 'FULL_TIME' : job.type === 'Bán thời gian' ? 'PART_TIME' : job.type === 'Thực tập' ? 'INTERN' : 'CONTRACTOR', hiringOrganization: { '@type': 'Organization', name: company.name, sameAs: company.website || undefined }, jobLocation: { '@type': 'Place', address: { '@type': 'PostalAddress', addressLocality: job.location, addressCountry: 'VN' } }, ...(job.workMode === 'Từ xa' ? { jobLocationType: 'TELECOMMUTE', applicantLocationRequirements: { '@type': 'Country', name: 'Vietnam' } } : {}), ...(job.salaryMin || job.salaryMax ? { baseSalary: { '@type': 'MonetaryAmount', currency: 'VND', value: { '@type': 'QuantitativeValue', minValue: job.salaryMin || undefined, maxValue: job.salaryMax || undefined, unitText: 'MONTH' } } } : {}) };
@@ -374,7 +388,7 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=60' }); res.end(req.method === 'HEAD' ? undefined : html); return;
     }
     if (url.pathname === '/sitemap.xml') {
-      const jobs = db.jobs.filter(job => job.status === 'published' && (!job.expiresAt || Date.parse(job.expiresAt) > Date.now()) && db.companies.some(company => company.id === job.companyId && company.verificationStatus === 'verified'));
+      const jobs = db.jobs.filter(job => job.status === 'published' && hasOpenPositions(db, job) && (!job.expiresAt || Date.parse(job.expiresAt) > Date.now()) && db.companies.some(company => company.id === job.companyId && company.verificationStatus === 'verified'));
       const entries = jobs.map(job => `<url><loc>${APP_BASE_URL}/jobs/${encodeURIComponent(job.slug || 'viec-lam')}--${job.id}</loc><lastmod>${new Date(job.updatedAt || job.publishedAt).toISOString().slice(0, 10)}</lastmod></url>`).join('');
       const sitemap = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${APP_BASE_URL}/</loc></url><url><loc>${APP_BASE_URL}/jobs.html</loc></url>${entries}</urlset>`;
       res.writeHead(200, { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=300' }); res.end(req.method === 'HEAD' ? undefined : sitemap); return;
@@ -420,8 +434,7 @@ const expirePublishedJobs = () => {
   if (changed) { audit(null, 'job.auto_expire', 'jobs'); save(); }
 };
 expirePublishedJobs();
-let assessmentUpdates = false;
-for (const job of db.jobs) assessmentUpdates = sprint9Api.assessJob(db, job) || assessmentUpdates;
+const assessmentUpdates = sprint9Api.assessJobs(db);
 if (assessmentUpdates) { audit(null, 'sprint9.moderation.initial_scan', 'jobs'); save(); }
 setInterval(expirePublishedJobs, 60_000).unref();
 sprint3Api.startWorker({ db, save, audit });

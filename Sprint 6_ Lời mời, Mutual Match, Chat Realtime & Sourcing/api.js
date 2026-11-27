@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('node:crypto');
+const { hasOpenPositions } = require('../Sprint 2_ Doanh nghiệp, Tin tuyển dụng, Tìm kiếm & Kiểm duyệt/job-capacity');
 
 const text = (value, max = 500) => String(value ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, max);
 const norm = value => text(value, 2000).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').toLowerCase();
@@ -9,7 +10,7 @@ const companyFor = (db, user) => (db.companies || []).find(item => item.ownerId 
 const userName = user => text(user?.profile?.fullName || user?.name || user?.email?.split('@')[0] || 'Thành viên', 100);
 const publicCompany = company => ({ id: company.id, name: company.name, logo: company.logo || '', website: company.website || '' });
 const liveJob = (db, id) => {
-  const job = (db.jobs || []).find(item => item.id === id && item.status === 'published' && (!item.expiresAt || Date.parse(item.expiresAt) > Date.now()));
+  const job = (db.jobs || []).find(item => item.id === id && item.status === 'published' && hasOpenPositions(db, item) && (!item.expiresAt || Date.parse(item.expiresAt) > Date.now()));
   const company = job && (db.companies || []).find(item => item.id === job.companyId && item.verificationStatus === 'verified');
   return job && company ? { job, company } : null;
 };
